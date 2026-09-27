@@ -1,0 +1,9 @@
+{
+  "name": "tugma-barangay-system",
+  "version": "1.0.0",
+  "description": "Rule-Based Similarity Matching System for Barangay Sta. Rita",
+  "type": "module",
+  "dependencies": {
+    "fast-levenshtein": "^3.0.0"
+  }
+}

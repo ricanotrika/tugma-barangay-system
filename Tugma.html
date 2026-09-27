@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tugma - Barangay System</title>
+
+  <!-- 1. LOGO IN BROWSER TAB (FAVICON) -->
+  <link rel="icon" type="image/png" href="Tugma.png">
+
+  <style>
+    :root {
+      --primary-color: #0f4c5c;
+      --bg-color: #f8f9fa;
+      --card-bg: #ffffff;
+      --text-color: #333333;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', sans-serif; }
+    body { background-color: var(--bg-color); color: var(--text-color); padding-bottom: 70px; }
+
+    .header {
+      background-color: var(--card-bg);
+      padding: 12px 20px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    }
+    .brand-logo { width: 36px; height: 36px; object-fit: contain; border-radius: 6px; }
+    .brand-title { font-size: 1.4rem; font-weight: bold; color: var(--primary-color); }
+
+    .tab-content { display: none; padding: 20px; }
+    .tab-content.active { display: block; }
+
+    .card { background: var(--card-bg); border-radius: 12px; padding: 16px; margin-bottom: 16px; border: 1px solid #e0e0e0; }
+    .form-group { margin-bottom: 15px; }
+    .form-group label { display: block; font-weight: 600; font-size: 0.85rem; margin-bottom: 6px; text-transform: uppercase; }
+    .form-control { width: 100%; padding: 10px 12px; border: 1px solid #cccccc; border-radius: 8px; font-size: 0.95rem; }
+    .btn-submit { width: 100%; background-color: var(--primary-color); color: white; border: none; padding: 12px; border-radius: 8px; font-size: 1rem; font-weight: bold; cursor: pointer; }
+
+    .bottom-nav { position: fixed; bottom: 0; left: 0; width: 100%; background: var(--card-bg); display: flex; justify-content: space-around; padding: 10px 0; border-top: 1px solid #e0e0e0; }
+    .nav-item { background: none; border: none; color: #777; font-size: 0.75rem; display: flex; flex-direction: column; align-items: center; cursor: pointer; }
+    .nav-item.active { color: var(--primary-color); font-weight: bold; }
+  </style>
+</head>
+<body>
+
+  <!-- App Header with Logo Image -->
+  <header class="header">
+    <img src="Tugma.png" alt="Tugma Logo" class="brand-logo">
+    <span class="brand-title">Tugma</span>
+  </header>
+
+  <!-- HOME TAB -->
+  <section id="home" class="tab-content active">
+    <div class="card">
+      <h3>Hello, Barangay Staff</h3>
+      <p style="color: #666; font-size: 0.9rem; margin-top: 4px;">Barangay Sta. Rita Lost & Found Portal</p>
+    </div>
+  </section>
+
+  <!-- REPORT TAB -->
+  <section id="report" class="tab-content">
+    <div class="card">
+      <h3>Encode Report & Search Matches</h3>
+      <form id="reportForm" style="margin-top: 15px;">
+        <div class="form-group">
+          <label>Category (30%)</label>
+          <select id="category" class="form-control">
+            <option value="Wallet">Wallet</option>
+            <option value="Cards / ID">Cards / ID</option>
+            <option value="Keys">Keys</option>
+            <option value="Phone">Phone</option>
+            <option value="Bag">Bag</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Item Color (20%)</label>
+          <input type="text" id="color" class="form-control" placeholder="e.g. Black">
+        </div>
+        <div class="form-group">
+          <label>Description (30%)</label>
+          <textarea id="description" class="form-control" rows="3" placeholder="Detailed description..."></textarea>
+        </div>
+        <div class="form-group">
+          <label>Location (10%)</label>
+          <input type="text" id="location" class="form-control" placeholder="e.g. Sta. Rita Covered Court">
+        </div>
+        <div class="form-group">
+          <label>Date (10%)</label>
+          <input type="date" id="date" class="form-control">
+        </div>
+        <button type="button" class="btn-submit" onclick="submitAndMatch()">Find Matches</button>
+      </form>
+    </div>
+  </section>
+
+  <!-- MATCHES TAB -->
+  <section id="matches" class="tab-content">
+    <div class="card">
+      <h3>Potential Item Matches</h3>
+      <p style="font-size: 0.85rem; color: #666;">Matches with score ≥ 70%</p>
+    </div>
+    <div id="resultsContainer"></div>
+  </section>
+
+  <!-- Bottom Nav -->
+  <nav class="bottom-nav">
+    <button class="nav-item active" onclick="switchTab('home', this)"><span>🏠 Home</span></button>
+    <button class="nav-item" onclick="switchTab('report', this)"><span>➕ Report</span></button>
+    <button class="nav-item" onclick="switchTab('matches', this)"><span>⚡ Matches</span></button>
+  </nav>
+
+  <script>
+    function switchTab(tabId, element) {
+      document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
+      document.querySelectorAll('.nav-item').forEach(nav => nav.classList.remove('active'));
+      document.getElementById(tabId).classList.add('active');
+      if (element) element.classList.add('active');
+    }
+
+    // Call Backend Vercel Serverless Endpoint
+    async function submitAndMatch() {
+      const lostReport = {
+        category: document.getElementById('category').value,
+        color: document.getElementById('color').value,
+        description: document.getElementById('description').value,
+        location: document.getElementById('location').value,
+        date: document.getElementById('date').value
+      };
+
+      // Mock database of existing found items (or fetch from DB)
+      const foundReports = [
+        { id: 101, category: 'Wallet', color: 'Black', description: 'Dark leather purse found near Plaza', location: 'Sta. Rita Covered Court', date: lostReport.date, reporterName: 'John Doe', reporterPhone: '09123456789' }
+      ];
+
+      try {
+        const response = await fetch('/api/match', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ lostReport, foundReports })
+        });
+
+        const data = await response.json();
+        
+        // Render matches on UI
+        const resultsDiv = document.getElementById('resultsContainer');
+        resultsDiv.innerHTML = '';
+
+        if (data.matches && data.matches.length > 0) {
+          data.matches.forEach(item => {
+            resultsDiv.innerHTML += `
+              <div class="card" style="border-left: 5px solid #0f4c5c;">
+                <h4>Match Score: ${item.matchScore}% (${item.confidenceTier} Confidence)</h4>
+                <p><strong>Found Item:</strong> ${item.foundItem.description}</p>
+                <p><strong>Location:</strong> ${item.foundItem.location}</p>
+              </div>
+            `;
+          });
+        } else {
+          resultsDiv.innerHTML = '<div class="card"><p>No potential matches found above 70% threshold.</p></div>';
+        }
+
+        switchTab('matches');
+      } catch (err) {
+        console.error("Error communicating with backend:", err);
+      }
+    }
+  </script>
+</body>
+</html>
