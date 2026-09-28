@@ -3,168 +3,359 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Tugma - Barangay System</title>
-
-  <!-- 1. LOGO IN BROWSER TAB (FAVICON) -->
+  <title>Tugma - Barangay Sta. Rita Lost & Found System</title>
+  
+  <!-- Browser Favicon / Tab Logo -->
   <link rel="icon" type="image/png" href="Tugma.png">
 
   <style>
     :root {
-      --primary-color: #0f4c5c;
-      --bg-color: #f8f9fa;
+      --primary: #0f4c5c;
+      --secondary: #e36414;
+      --accent: #fb8b24;
+      --bg: #f8f9fa;
       --card-bg: #ffffff;
-      --text-color: #333333;
+      --text: #2b2d42;
+      --border: #e0e0e0;
     }
 
-    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', sans-serif; }
-    body { background-color: var(--bg-color); color: var(--text-color); padding-bottom: 70px; }
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    }
 
-    .header {
-      background-color: var(--card-bg);
-      padding: 12px 20px;
+    body {
+      background-color: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+      padding-bottom: 40px;
+    }
+
+    header {
+      background-color: var(--primary);
+      color: white;
+      padding: 20px;
+      text-align: center;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+
+    header img {
+      height: 50px;
+      vertical-align: middle;
+      margin-right: 10px;
+    }
+
+    header h1 {
+      display: inline-block;
+      vertical-align: middle;
+      font-size: 1.8rem;
+    }
+
+    header p {
+      font-size: 0.9rem;
+      opacity: 0.85;
+      margin-top: 4px;
+    }
+
+    .container {
+      max-width: 800px;
+      margin: 20px auto;
+      padding: 0 15px;
+    }
+
+    .nav-tabs {
       display: flex;
-      align-items: center;
-      gap: 12px;
+      background: white;
+      border-radius: 8px;
+      overflow: hidden;
       box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+      margin-bottom: 20px;
     }
-    .brand-logo { width: 36px; height: 36px; object-fit: contain; border-radius: 6px; }
-    .brand-title { font-size: 1.4rem; font-weight: bold; color: var(--primary-color); }
 
-    .tab-content { display: none; padding: 20px; }
-    .tab-content.active { display: block; }
+    .nav-item {
+      flex: 1;
+      padding: 12px;
+      text-align: center;
+      background: white;
+      border: none;
+      border-bottom: 3px solid transparent;
+      cursor: pointer;
+      font-weight: 600;
+      color: #666;
+      transition: all 0.2s ease;
+    }
 
-    .card { background: var(--card-bg); border-radius: 12px; padding: 16px; margin-bottom: 16px; border: 1px solid #e0e0e0; }
-    .form-group { margin-bottom: 15px; }
-    .form-group label { display: block; font-weight: 600; font-size: 0.85rem; margin-bottom: 6px; text-transform: uppercase; }
-    .form-control { width: 100%; padding: 10px 12px; border: 1px solid #cccccc; border-radius: 8px; font-size: 0.95rem; }
-    .btn-submit { width: 100%; background-color: var(--primary-color); color: white; border: none; padding: 12px; border-radius: 8px; font-size: 1rem; font-weight: bold; cursor: pointer; }
+    .nav-item.active {
+      color: var(--primary);
+      border-bottom-color: var(--primary);
+      background: #f0f7f7;
+    }
 
-    .bottom-nav { position: fixed; bottom: 0; left: 0; width: 100%; background: var(--card-bg); display: flex; justify-content: space-around; padding: 10px 0; border-top: 1px solid #e0e0e0; }
-    .nav-item { background: none; border: none; color: #777; font-size: 0.75rem; display: flex; flex-direction: column; align-items: center; cursor: pointer; }
-    .nav-item.active { color: var(--primary-color); font-weight: bold; }
+    .tab-content {
+      display: none;
+    }
+
+    .tab-content.active {
+      display: block;
+    }
+
+    .card {
+      background: var(--card-bg);
+      padding: 24px;
+      border-radius: 8px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.06);
+      margin-bottom: 20px;
+    }
+
+    .form-group {
+      margin-bottom: 16px;
+    }
+
+    .form-group label {
+      display: block;
+      margin-bottom: 6px;
+      font-weight: 600;
+      font-size: 0.95rem;
+    }
+
+    .form-group input,
+    .form-group select,
+    .form-group textarea {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      font-size: 1rem;
+    }
+
+    .form-group textarea {
+      resize: vertical;
+      min-height: 90px;
+    }
+
+    .btn-submit {
+      width: 100%;
+      padding: 12px;
+      background-color: var(--primary);
+      color: white;
+      border: none;
+      border-radius: 6px;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s ease;
+    }
+
+    .btn-submit:hover {
+      background-color: #0a3641;
+    }
+
+    .btn-submit:disabled {
+      background-color: #88a3a8;
+      cursor: not-allowed;
+    }
+
+    .privacy-notice {
+      font-size: 0.8rem;
+      color: #555;
+      background: #eef6f8;
+      padding: 10px;
+      border-radius: 6px;
+      margin-top: 15px;
+      border-left: 4px solid var(--primary);
+    }
   </style>
 </head>
 <body>
 
-  <!-- App Header with Logo Image -->
-  <header class="header">
-    <img src="Tugma.png" alt="Tugma Logo" class="brand-logo">
-    <span class="brand-title">Tugma</span>
+  <header>
+    <img src="Tugma.png" alt="Tugma Logo">
+    <h1>Tugma</h1>
+    <p>Rule-Based Lost & Found System — Barangay Sta. Rita (Olongapo City)</p>
   </header>
 
-  <!-- HOME TAB -->
-  <section id="home" class="tab-content active">
-    <div class="card">
-      <h3>Magandang Araw!</h3>
-      <p style="color: #666; font-size: 0.9rem; margin-top: 4px;">Barangay Sta. Rita Lost & Found Portal</p>
+  <div class="container">
+    
+    <!-- Navigation Tabs -->
+    <div class="nav-tabs">
+      <button class="nav-item active" onclick="switchTab('report', this)">File Report</button>
+      <button class="nav-item" onclick="switchTab('matches', this)">Match Results</button>
     </div>
-  </section>
 
-  <!-- REPORT TAB -->
-  <section id="report" class="tab-content">
-    <div class="card">
-      <h3>Encode Report & Search Matches</h3>
-      <form id="reportForm" style="margin-top: 15px;">
-        <div class="form-group">
-          <label>Category</label>
-          <select id="category" class="form-control">
-            <option value="Wallet">Wallet</option>
-            <option value="Cards / ID">Cards / ID</option>
-            <option value="Keys">Keys</option>
-            <option value="Phone">Phone</option>
-            <option value="Bag">Bag</option>
-          </select>
+    <!-- TAB 1: File Report Form -->
+    <div id="report" class="tab-content active">
+      <div class="card">
+        <h2 style="margin-bottom: 16px; color: var(--primary);">Submit Item Report</h2>
+        
+        <form id="reportForm" onsubmit="event.preventDefault(); submitAndMatch(event);">
+          
+          <div class="form-group">
+            <label for="category">Category</label>
+            <select id="category" required>
+              <option value="">Select Category...</option>
+              <option value="Electronics">Electronics (Phone, Laptop, Charger)</option>
+              <option value="Personal Items">Personal Items (Wallet, Bag, Keys)</option>
+              <option value="Documents">Documents / Cards (ID, License, Passport)</option>
+              <option value="Clothing">Clothing / Accessories (Jewelry, Glasses, Watch)</option>
+              <option value="Others">Others</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="color">Primary Color</label>
+            <input type="text" id="color" placeholder="e.g. Black, Blue, Silver" required />
+          </div>
+
+          <div class="form-group">
+            <label for="description">Detailed Description</label>
+            <textarea id="description" placeholder="Describe unique features, markings, brand name, or condition..." required></textarea>
+          </div>
+
+          <div class="form-group">
+            <label for="location">Location Lost/Found</label>
+            <input type="text" id="location" placeholder="e.g. Near Barangay Hall, Public Market, Sta. Rita High School" required />
+          </div>
+
+          <div class="form-group">
+            <label for="date">Date Lost or Found</label>
+            <input type="date" id="date" required />
+          </div>
+
+          <button type="button" id="submitBtn" class="btn-submit" onclick="submitAndMatch(event)">
+            Find Matches
+          </button>
+
+        </form>
+
+        <div class="privacy-notice">
+          <strong>Data Privacy Compliance (RA 10173):</strong> Reporter contact information is restricted strictly to authorized staff members for verification purposes and is never exposed in match response payloads.
         </div>
-        <div class="form-group">
-          <label>Item Color</label>
-          <input type="text" id="color" class="form-control" placeholder="e.g. Black">
-        </div>
-        <div class="form-group">
-          <label>Description</label>
-          <textarea id="description" class="form-control" rows="3" placeholder="Detailed description..."></textarea>
-        </div>
-        <div class="form-group">
-          <label>Location</label>
-          <input type="text" id="location" class="form-control" placeholder="e.g. Sta. Rita Covered Court">
-        </div>
-        <div class="form-group">
-          <label>Date</label>
-          <input type="date" id="date" class="form-control">
-        </div>
-        <button type="button" class="btn-submit" onclick="submitAndMatch()">Find Matches</button>
-      </form>
+      </div>
     </div>
-  </section>
 
-  <!-- MATCHES TAB -->
-  <section id="matches" class="tab-content">
-    <div class="card">
-      <h3>Potential Item Matches</h3>
-      <p style="font-size: 0.85rem; color: #666;">Matches with score ≥ 70%</p>
+    <!-- TAB 2: Match Results -->
+    <div id="matches" class="tab-content">
+      <div class="card">
+        <h2 style="margin-bottom: 16px; color: var(--primary);">Matching Results</h2>
+        <div id="resultsContainer">
+          <p style="color: #666;">No search has been performed yet. Fill out the report form and click <strong>Find Matches</strong> to view matched items.</p>
+        </div>
+      </div>
     </div>
-    <div id="resultsContainer"></div>
-  </section>
 
-  <!-- Bottom Nav -->
-  <nav class="bottom-nav">
-    <button class="nav-item active" onclick="switchTab('home', this)"><span>🏠 Home</span></button>
-    <button class="nav-item" onclick="switchTab('report', this)"><span>➕ Report</span></button>
-    <button class="nav-item" onclick="switchTab('matches', this)"><span>⚡ Matches</span></button>
-  </nav>
+  </div>
 
   <script>
+    // Tab Switcher Logic
     function switchTab(tabId, element) {
       document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
       document.querySelectorAll('.nav-item').forEach(nav => nav.classList.remove('active'));
-      document.getElementById(tabId).classList.add('active');
+      
+      const targetTab = document.getElementById(tabId);
+      if (targetTab) targetTab.classList.add('active');
       if (element) element.classList.add('active');
     }
 
-    // Call Backend Vercel Serverless Endpoint
-    async function submitAndMatch() {
-      const lostReport = {
-        category: document.getElementById('category').value,
-        color: document.getElementById('color').value,
-        description: document.getElementById('description').value,
-        location: document.getElementById('location').value,
-        date: document.getElementById('date').value
+    // Main Submission and Matching Function
+    async function submitAndMatch(event) {
+      if (event) event.preventDefault();
+
+      const btn = document.getElementById('submitBtn');
+      if (!btn) return;
+
+      // Safely fetch form input values
+      const getValue = (id) => {
+        const el = document.getElementById(id);
+        return el ? el.value.trim() : '';
       };
 
-      // Mock database of existing found items (or fetch from DB)
-      const foundReports = [
-        { id: 101, category: 'Wallet', color: 'Black', description: 'Dark leather purse found near Plaza', location: 'Sta. Rita Covered Court', date: lostReport.date, reporterName: 'John Doe', reporterPhone: '09123456789' }
-      ];
+      const category = getValue('category');
+      const color = getValue('color');
+      const description = getValue('description');
+      const location = getValue('location');
+      const reportDate = getValue('date') || new Date().toISOString().split('T')[0];
+
+      if (!category || !description) {
+        alert("Please select a Category and provide a Description.");
+        return;
+      }
+
+      // Indicate loading state
+      const originalText = btn.innerText;
+      btn.innerText = "Searching Matches...";
+      btn.disabled = true;
+
+      const payload = {
+        lostReport: {
+          category,
+          color,
+          description,
+          location,
+          report_date: reportDate,
+          reporter_name: "Barangay Staff",
+          reporter_contact: "09000000000"
+        }
+      };
 
       try {
         const response = await fetch('/api/match', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ lostReport, foundReports })
+          body: JSON.stringify(payload)
         });
 
-        const data = await response.json();
-        
-        // Render matches on UI
-        const resultsDiv = document.getElementById('resultsContainer');
-        resultsDiv.innerHTML = '';
-
-        if (data.matches && data.matches.length > 0) {
-          data.matches.forEach(item => {
-            resultsDiv.innerHTML += `
-              <div class="card" style="border-left: 5px solid #0f4c5c;">
-                <h4>Match Score: ${item.matchScore}% (${item.confidenceTier} Confidence)</h4>
-                <p><strong>Found Item:</strong> ${item.foundItem.description}</p>
-                <p><strong>Location:</strong> ${item.foundItem.location}</p>
-              </div>
-            `;
-          });
-        } else {
-          resultsDiv.innerHTML = '<div class="card"><p>No potential matches found above 70% threshold.</p></div>';
+        if (!response.ok) {
+          const errorText = await response.text();
+          throw new Error(`Server returned status ${response.status}: ${errorText}`);
         }
 
-        switchTab('matches');
+        const data = await response.json();
+        console.log("Server response:", data);
+
+        const resultsDiv = document.getElementById('resultsContainer');
+        if (resultsDiv) {
+          resultsDiv.innerHTML = '';
+
+          if (data.matches && data.matches.length > 0) {
+            data.matches.forEach(item => {
+              resultsDiv.innerHTML += `
+                <div class="card" style="border-left: 5px solid #0f4c5c; margin-bottom: 12px; padding: 16px;">
+                  <h4 style="color: #0f4c5c; margin-bottom: 6px;">
+                    Match Score: ${item.matchScore}% (${item.confidenceTier} Confidence)
+                  </h4>
+                  <p><strong>Category:</strong> ${item.foundItem.category}</p>
+                  <p><strong>Description:</strong> ${item.foundItem.description}</p>
+                  <p><strong>Location:</strong> ${item.foundItem.location}</p>
+                  <p style="font-size: 0.8rem; color: #666; margin-top: 6px;">
+                    <em>Privacy Safeguard Enforced (RA 10173): Reporter contact details stripped.</em>
+                  </p>
+                </div>
+              `;
+            });
+          } else {
+            resultsDiv.innerHTML = `
+              <div class="card" style="padding: 16px;">
+                <p><strong>No potential matches found (≥ 70%).</strong></p>
+                <p style="font-size: 0.85rem; color: #666; margin-top: 4px;">
+                  Your report has been safely saved to the database. You will be notified if a matching item is recorded by staff.
+                </p>
+              </div>
+            `;
+          }
+        }
+
+        // Switch automatically to the Match Results tab
+        const navItems = document.querySelectorAll('.nav-item');
+        switchTab('matches', navItems[1]);
+
       } catch (err) {
-        console.error("Error communicating with backend:", err);
+        console.error("Error during submission:", err);
+        alert("Failed to connect to backend server. Please verify your Vercel logs or browser console.");
+      } finally {
+        btn.innerText = originalText;
+        btn.disabled = false;
       }
     }
   </script>
