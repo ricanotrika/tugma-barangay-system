@@ -1,11 +1,6 @@
 {
   "version": 2,
-  "builds": [
-    { "src": "index.html", "use": "@vercel/static" },
-    { "src": "api/match.js", "use": "@vercel/node" }
-  ],
-  "routes": [
-    { "src": "/api/match", "dest": "/api/match.js" },
-    { "src": "/(.*)", "dest": "/index.html" }
+  "rewrites": [
+    { "source": "/api/match", "destination": "/api/match.js" }
   ]
 }
