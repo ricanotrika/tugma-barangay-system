@@ -1,10 +1,18 @@
 import levenshtein from "fast-levenshtein";
 import { createClient } from "@supabase/supabase-js";
 
-const supabase = createClient(
-  process.env.SUPABASE_URL,
-  process.env.SUPABASE_SERVICE_KEY, // server-side only, never put this in index.html
-);
+// Created inside the handler so config problems return a readable error
+function getSupabase() {
+  const url = process.env.SUPABASE_URL;
+  const key = process.env.SUPABASE_SERVICE_KEY;
+  if (!url || !key) {
+    throw new Error(
+      "Missing environment variable: " +
+        [!url && "SUPABASE_URL", !key && "SUPABASE_SERVICE_KEY"].filter(Boolean).join(", "),
+    );
+  }
+  return createClient(url, key); // service key stays server-side only
+}
 
 // Synonym normalization map (Section 1.4.2)
 const SYNONYM_MAP = {
@@ -138,6 +146,8 @@ export default async function handler(req, res) {
   }
 
   try {
+    const supabase = getSupabase();
+
     // 1. Save the new lost report
     const { error: insertError } = await supabase.from("reports").insert({
       type: "lost",
