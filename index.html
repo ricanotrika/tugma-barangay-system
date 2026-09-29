@@ -408,7 +408,7 @@
           </div>
 
           <button type="button" id="submitBtn" class="btn-submit" onclick="submitAndMatch(event)">
-            Find Match
+            Report Item
           </button>
 
         </form>
@@ -441,6 +441,13 @@
       const targetTab = document.getElementById(tabId);
       if (targetTab) targetTab.classList.add('active');
       if (element) element.classList.add('active');
+    }
+
+    // Escape user-supplied text before inserting into HTML
+    function esc(value) {
+      return String(value ?? '').replace(/[&<>"']/g, ch => ({
+        '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+      }[ch]));
     }
 
     // Client-side execution script
@@ -511,26 +518,26 @@
               resultsDiv.innerHTML += `
                 <div class="match-card">
                   <div class="match-header">
-                    <span class="match-score">${item.matchScore}% Weighted Match Score</span>
+                    <span class="match-score">${esc(item.matchScore)}% Weighted Match Score</span>
                     <span class="badge ${badgeClass}">${tierLabel}</span>
                   </div>
-                  <p style="margin-bottom: 4px;"><strong>Category:</strong> ${item.foundItem.category} | <strong>Color:</strong> ${item.foundItem.color}</p>
-                  <p style="margin-bottom: 4px;"><strong>Description:</strong> ${item.foundItem.description}</p>
-                  <p style="margin-bottom: 8px;"><strong>Location:</strong> ${item.foundItem.location} | <strong>Date:</strong> ${item.foundItem.report_date}</p>
+                  <p style="margin-bottom: 4px;"><strong>Category:</strong> ${esc(item.foundItem.category)} | <strong>Color:</strong> ${esc(item.foundItem.color)}</p>
+                  <p style="margin-bottom: 4px;"><strong>Description:</strong> ${esc(item.foundItem.description)}</p>
+                  <p style="margin-bottom: 8px;"><strong>Location:</strong> ${esc(item.foundItem.location)} | <strong>Date:</strong> ${esc(item.foundItem.report_date)}</p>
 
                   <div class="breakdown-grid">
-                    <div class="breakdown-item">Category (30%)<strong>${item.scoreBreakdown?.category || 30}%</strong></div>
-                    <div class="breakdown-item">Color (20%)<strong>${item.scoreBreakdown?.color || 20}%</strong></div>
-                    <div class="breakdown-item">Text Similarity (30%)<strong>${item.scoreBreakdown?.description || 25}%</strong></div>
-                    <div class="breakdown-item">Location (10%)<strong>${item.scoreBreakdown?.location || 10}%</strong></div>
-                    <div class="breakdown-item">Date (10%)<strong>${item.scoreBreakdown?.date || 10}%</strong></div>
+                    <div class="breakdown-item">Category (30%)<strong>${item.scoreBreakdown ? item.scoreBreakdown.category : '—'} / 30</strong></div>
+                    <div class="breakdown-item">Color (20%)<strong>${item.scoreBreakdown ? item.scoreBreakdown.color : '—'} / 20</strong></div>
+                    <div class="breakdown-item">Text Similarity (30%)<strong>${item.scoreBreakdown ? item.scoreBreakdown.description : '—'} / 30</strong></div>
+                    <div class="breakdown-item">Location (10%)<strong>${item.scoreBreakdown ? item.scoreBreakdown.location : '—'} / 10</strong></div>
+                    <div class="breakdown-item">Date (10%)<strong>${item.scoreBreakdown ? item.scoreBreakdown.date : '—'} / 10</strong></div>
                   </div>
                 </div>
               `;
             });
           } else {
             resultsDiv.innerHTML = `
-              <div style="padding: 16px; border: 1px border #dde1e5; border-radius: 6px;">
+              <div style="padding: 16px; border: 1px solid #dde1e5; border-radius: 6px;">
                 <p><strong>No matches found meeting the threshold (≥ 70%).</strong></p>
                 <p style="font-size: 0.85rem; color: var(--text-muted); margin-top: 4px;">
                   The report has been saved to the database. Staff will be alerted if a matching item is brought to the barangay hall.
