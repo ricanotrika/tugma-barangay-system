@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Tugma - Lost & Found System</title>
+  <title>Tugma - Barangay Sta. Rita Lost & Found System</title>
   <link rel="icon" type="image/png" href="Tugma.png">
   <style>
     :root {
@@ -353,7 +353,7 @@
             </div>
 
             <div class="form-group">
-              <label for="category">Item Category</label>
+              <label for="category">Item Category (30% Weight)</label>
               <select id="category" required>
                 <option value="">Select Category...</option>
                 <option value="Electronics">Electronics (Phone, Laptop, Charger)</option>
@@ -365,22 +365,22 @@
             </div>
 
             <div class="form-group">
-              <label for="color">Primary Color</label>
+              <label for="color">Primary Color (20% Weight)</label>
               <input type="text" id="color" placeholder="e.g. Black, Navy Blue, Silver" required />
             </div>
 
             <div class="form-group full-width">
-              <label for="description">Detailed Description</label>
+              <label for="description">Detailed Description (30% Levenshtein Text Match)</label>
               <textarea id="description" placeholder="Describe unique features, markings, brand name, or contents inside..." required></textarea>
             </div>
 
             <div class="form-group">
-              <label for="location">Location Lost / Found</label>
+              <label for="location">Location Lost / Found (10% Proximity)</label>
               <input type="text" id="location" placeholder="e.g. Sta. Rita Public Market, High School" required />
             </div>
 
             <div class="form-group">
-              <label for="date">Incident Date</label>
+              <label for="date">Incident Date (10% Temporal Proximity)</label>
               <input type="date" id="date" required />
             </div>
           </div>
@@ -408,7 +408,7 @@
           </div>
 
           <button type="button" id="submitBtn" class="btn-submit" onclick="submitAndMatch(event)">
-            Report Item
+            Execute Rule-Based Matching Engine
           </button>
 
         </form>
@@ -419,7 +419,7 @@
     <div id="matches" class="tab-content">
       <div class="card">
         <div class="section-title">
-          <span>Possible Matches</span>
+          <span>Ranked Similarity Matches</span>
         </div>
         
         <div id="resultsContainer">
@@ -553,7 +553,10 @@
 
       } catch (err) {
         console.error("Match Execution Error:", err);
-        alert("Failed to reach the matching engine backend. Check browser console or server deployment.");
+        const onFile = location.protocol === 'file:';
+        alert(onFile
+          ? "You opened this page as a local file (file://). Open your Vercel URL (https://...vercel.app) instead, or run 'npx vercel dev' and use http://localhost:3000."
+          : "Matching failed: " + err.message);
       } finally {
         btn.innerText = originalText;
         btn.disabled = false;
