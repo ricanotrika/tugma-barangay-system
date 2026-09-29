@@ -141,8 +141,11 @@ export default async function handler(req, res) {
   }
 
   const { lostReport } = req.body || {};
-  if (!lostReport || !lostReport.category) {
-    return res.status(400).json({ message: "Invalid payload structure." });
+  // Your reports table requires these fields (NOT NULL)
+  const required = ["category", "color", "description", "location", "report_date", "reporter_name", "reporter_contact"];
+  const missing = lostReport ? required.filter((k) => !lostReport[k]) : required;
+  if (missing.length) {
+    return res.status(400).json({ message: "Missing fields: " + missing.join(", ") });
   }
 
   try {
@@ -150,7 +153,7 @@ export default async function handler(req, res) {
 
     // 1. Save the new lost report
     const { error: insertError } = await supabase.from("reports").insert({
-      type: "lost",
+      report_type: "lost",
       category: lostReport.category,
       color: lostReport.color,
       description: lostReport.description,
@@ -165,7 +168,7 @@ export default async function handler(req, res) {
     const { data: foundReports, error } = await supabase
       .from("reports")
       .select("*")
-      .eq("type", "found");
+      .eq("report_type", "found");
     if (error) throw error;
 
     // 3. Score, strip private data, filter, sort
