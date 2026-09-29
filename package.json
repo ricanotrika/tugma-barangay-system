@@ -3,7 +3,11 @@
   "version": "1.0.0",
   "description": "Rule-Based Similarity Matching System for Barangay Sta. Rita",
   "type": "module",
+  "engines": {
+    "node": "22.x"
+  },
   "dependencies": {
+    "@supabase/supabase-js": "^2.117.2",
     "fast-levenshtein": "^3.0.0"
   }
 }
