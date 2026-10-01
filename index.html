@@ -1,567 +1,804 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Tugma - Barangay Sta. Rita Lost & Found System</title>
-  <link rel="icon" type="image/png" href="Tugma.png">
-  <style>
-    :root {
-      --primary: #0f4c5c;
-      --primary-dark: #0a3641;
-      --secondary: #e36414;
-      --bg: #f4f6f8;
-      --card-bg: #ffffff;
-      --text-main: #2b2d42;
-      --text-muted: #6c757d;
-      --border: #dde1e5;
-      --success: #2a9d8f;
-      --warning: #e9c46a;
-    }
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light dark">
+<title>Tugma: Lost and Found, Barangay Sta. Rita</title>
+<link rel="icon" href="Tugma.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@600;700;800&family=Public+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --brand:#12475c; --brand-deep:#0c3445; --green:#1e9470; --green-deep:#157556;
+  --accent-text:#12475c; --green-text:#157556;
+  --bg:#eef3f2; --surface:#ffffff; --ink:#13242b; --muted:#566b73;
+  --line:#d6e0e1; --line-strong:#b4c6c8;
+  --soft-brand:#e1edf1; --soft-green:#dff1ea;
+  --warn:#8f5605; --soft-warn:#fbefd9; --danger:#b3302b; --soft-danger:#fbe5e3;
+  --font-head:"Bricolage Grotesque","Segoe UI",system-ui,sans-serif;
+  --font-body:"Public Sans","Segoe UI",system-ui,sans-serif;
+}
+@media (prefers-color-scheme:dark){
+  :root{
+    --brand:#1d6483; --brand-deep:#174f68; --green:#23a37c; --green-deep:#1b8765;
+    --accent-text:#8fd0e8; --green-text:#6fd2b0;
+    --bg:#0d181c; --surface:#14242a; --ink:#e8f1f2; --muted:#9fb4ba;
+    --line:#25393f; --line-strong:#38535c;
+    --soft-brand:#173b49; --soft-green:#143a2e;
+    --warn:#f0b865; --soft-warn:#3a2c12; --danger:#ff8f88; --soft-danger:#3d1d1b;
+  }
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font:400 1rem/1.55 var(--font-body)}
+h1,h2,h3{font-family:var(--font-head);line-height:1.15;margin:0;letter-spacing:-.02em}
+p{margin:0}
+[hidden]{display:none!important}
+a{color:var(--accent-text)}
+button,input,select,textarea{font:inherit;color:inherit}
+:focus-visible{outline:3px solid var(--green);outline-offset:2px}
+.sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
 
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-    }
+/* ---------- Header ---------- */
+.topbar{background:var(--surface);border-bottom:1px solid var(--line)}
+.topbar-in{max-width:1180px;margin:0 auto;padding:12px 20px;display:flex;align-items:center;gap:16px}
+.brand{display:flex;align-items:center;gap:12px;text-decoration:none;color:inherit;margin-right:auto}
+.brand img{height:42px;width:auto;border-radius:10px;display:block}
+.brand b{font:800 1.35rem/1 var(--font-head);letter-spacing:-.02em;display:block}
+.brand small{color:var(--muted);font-size:.8rem}
+.nav{display:flex;gap:4px}
+.nav a{white-space:nowrap;padding:8px 14px;border-radius:999px;text-decoration:none;color:var(--muted);font-weight:600;font-size:.95rem}
+.nav a:hover{background:var(--soft-brand);color:var(--accent-text)}
+.nav a[aria-current="page"]{background:var(--brand);color:#fff}
 
-    body {
-      background-color: var(--bg);
-      color: var(--text-main);
-      line-height: 1.5;
-      padding-bottom: 40px;
-    }
+main{max-width:760px;margin:0 auto;padding:36px 20px 72px}
+main.wide{max-width:1180px}
 
-    /* Top Navigation Header */
-    header {
-      background-color: var(--primary);
-      color: white;
-      padding: 16px 24px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-    }
+/* ---------- Report: hero + pair ---------- */
+.hero h1{font-size:clamp(2rem,6vw,3rem);font-weight:800;max-width:15ch}
+.hero p{color:var(--muted);margin:12px 0 28px;max-width:52ch;font-size:1.05rem}
 
-    .brand {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-    }
+.pair{display:grid;grid-template-columns:1fr 1fr;margin-bottom:28px}
+.tile{position:relative;text-align:left;border:0;cursor:pointer;min-height:116px;padding:22px 26px;
+  display:flex;flex-direction:column;justify-content:center;gap:4px;transition:background .2s,color .2s}
+.tile-title{font:700 1.2rem/1.2 var(--font-head);letter-spacing:-.01em}
+.tile-sub{font-size:.88rem;opacity:.9}
+.tile-lost{background:var(--brand);color:#fff;border-radius:28px 6px 6px 28px;z-index:2}
+.tile-found{background:var(--green);color:#fff;border-radius:6px 28px 28px 6px;padding-left:46px}
+.tile-lost::after{content:"";position:absolute;right:-26px;top:50%;width:52px;height:52px;margin-top:-26px;border-radius:50%;background:inherit;transition:background .2s}
+.tile[aria-checked="false"].tile-lost{background:var(--soft-brand);color:var(--accent-text)}
+.tile[aria-checked="false"].tile-found{background:var(--soft-green);color:var(--green-text)}
+.tile[aria-checked="true"] .tile-title::before{content:"\2713\00a0"}
+.tile:hover[aria-checked="false"]{filter:brightness(.97)}
 
-    .brand img {
-      height: 40px;
-      width: auto;
-    }
+/* ---------- Cards, fields ---------- */
+.card{background:var(--surface);border:1px solid var(--line);border-radius:20px;padding:28px}
+.card h2{font-size:1.5rem;font-weight:700;margin-bottom:20px}
+.grid2{display:grid;gap:18px;grid-template-columns:1fr}
+@media (min-width:640px){.grid2{grid-template-columns:1fr 1fr}}
+.field{border:0;margin:0 0 18px;padding:0;min-width:0}
+.field>label,.field>legend{display:block;font-weight:600;font-size:.95rem;margin-bottom:6px;padding:0}
+.hint{color:var(--muted);font-size:.85rem;margin-top:5px}
+.input{width:100%;padding:12px 14px;border:1.5px solid var(--line-strong);border-radius:12px;background:var(--bg);transition:border-color .15s,background .15s}
+.input:hover{border-color:var(--muted)}
+.input:focus{outline:none;border-color:var(--green);background:var(--surface);box-shadow:0 0 0 3px color-mix(in srgb,var(--green) 28%,transparent)}
+textarea.input{min-height:104px;resize:vertical}
+.field.bad .input,.field.bad .chip span{border-color:var(--danger)}
+.error{color:var(--danger);font-size:.85rem;font-weight:600;margin-top:5px}
 
-    .brand h1 {
-      font-size: 1.4rem;
-      font-weight: 700;
-      letter-spacing: 0.5px;
-    }
+.chips{display:grid;gap:8px;grid-template-columns:repeat(auto-fill,minmax(190px,1fr))}
+.chip{position:relative;display:block}
+.chip input{position:absolute;opacity:0;inset:0;cursor:pointer;margin:0}
+.chip span{display:block;padding:11px 14px;border:1.5px solid var(--line-strong);border-radius:12px;background:var(--bg);transition:border-color .15s,background .15s}
+.chip b{display:block;font-weight:600;font-size:.95rem}
+.chip small{color:var(--muted);font-size:.8rem}
+.chip:hover span{border-color:var(--muted)}
+.chip input:checked+span{border-color:var(--brand);background:var(--soft-brand);box-shadow:inset 0 0 0 1px var(--brand)}
+.chip input:focus-visible+span{outline:3px solid var(--green);outline-offset:2px}
 
-    .brand p {
-      font-size: 0.8rem;
-      opacity: 0.85;
-    }
+.privacy{display:flex;gap:12px;background:var(--soft-brand);border-radius:12px;padding:13px 15px;font-size:.88rem;color:var(--ink);margin:6px 0 22px}
+.privacy svg{flex:none;margin-top:2px;color:var(--accent-text)}
 
-    .user-profile {
-      font-size: 0.85rem;
-      background: rgba(255, 255, 255, 0.15);
-      padding: 6px 12px;
-      border-radius: 20px;
-    }
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;border:0;border-radius:12px;padding:12px 20px;font-weight:700;cursor:pointer;background:var(--brand);color:#fff;transition:background .15s}
+.btn:hover{background:var(--brand-deep)}
+.btn:disabled{opacity:.65;cursor:progress}
+.btn.block{width:100%;padding:15px 20px;font-size:1.05rem}
+.btn.green{background:var(--green)}.btn.green:hover{background:var(--green-deep)}
+.btn.ghost{background:transparent;color:var(--accent-text);box-shadow:inset 0 0 0 1.5px var(--line-strong)}
+.btn.ghost:hover{background:var(--soft-brand)}
+.btn.small{padding:7px 12px;font-size:.88rem;border-radius:9px}
+.spinner{width:16px;height:16px;border-radius:50%;border:2.5px solid rgba(255,255,255,.4);border-top-color:#fff;animation:spin .8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.form-error{background:var(--soft-danger);color:var(--danger);border-radius:12px;padding:12px 15px;font-weight:600;margin-bottom:16px}
 
-    /* Main Container */
-    .container {
-      max-width: 960px;
-      margin: 24px auto;
-      padding: 0 16px;
-    }
+/* ---------- Result ---------- */
+.done{display:flex;gap:16px;align-items:flex-start;margin-bottom:22px}
+.done-icon{flex:none;width:48px;height:48px;border-radius:50%;background:var(--green);color:#fff;display:grid;place-items:center}
+.done h2{font-size:1.6rem;margin-bottom:6px}
+.done p{color:var(--muted)}
+.refno{display:inline-block;background:var(--soft-green);color:var(--green-text);font-weight:700;border-radius:8px;padding:0 8px}
+.matches{display:grid;gap:14px;margin:20px 0}
+.match{display:grid;grid-template-columns:auto 1fr;gap:18px;background:var(--surface);border:1px solid var(--line);border-left:6px solid var(--green);border-radius:6px 18px 18px 6px;padding:18px}
+.match.med{border-left-color:#d49a2e}.match.low{border-left-color:var(--line-strong)}
+.ring{--p:0;--c:var(--green);width:76px;height:76px;border-radius:50%;background:conic-gradient(var(--c) calc(var(--p)*1%),var(--line) 0);display:grid;place-items:center;position:relative}
+.ring::before{content:"";position:absolute;inset:7px;background:var(--surface);border-radius:50%}
+.ring b{position:relative;font:800 1.2rem/1 var(--font-head)}
+.match.med .ring{--c:#d49a2e}.match.low .ring{--c:var(--line-strong)}
+.match h3{font-size:1.1rem;font-weight:700}
+.match .meta{color:var(--muted);font-size:.9rem;margin:2px 0 8px}
+.match .desc{margin-bottom:10px}
+.tier{display:inline-block;font-size:.78rem;font-weight:700;border-radius:999px;padding:2px 10px;margin-left:6px;vertical-align:2px;background:var(--soft-green);color:var(--green-text)}
+.match.med .tier{background:var(--soft-warn);color:var(--warn)}.match.low .tier{background:var(--line);color:var(--muted)}
+.meters{list-style:none;margin:0;padding:0;display:grid;gap:6px 22px;grid-template-columns:1fr;font-size:.8rem;color:var(--muted)}
+@media (min-width:560px){.meters{grid-template-columns:1fr 1fr}}
+.meters li{display:grid;grid-template-columns:78px 1fr 34px;gap:8px;align-items:center}
+.bar{height:6px;border-radius:99px;background:var(--line);overflow:hidden}
+.bar i{display:block;height:100%;background:var(--green);border-radius:99px}
+.pts{text-align:right;font-variant-numeric:tabular-nums}
+.next{background:var(--soft-brand);border-radius:16px;padding:18px 20px}
+.next h3{font-size:1.05rem;margin-bottom:6px}
+.next p{color:var(--ink);font-size:.95rem}
+.actions-row{display:flex;gap:10px;flex-wrap:wrap;margin-top:20px}
+@media (max-width:480px){.match{grid-template-columns:1fr}.ring{width:64px;height:64px}}
 
-    /* Navigation Tabs */
-    .nav-tabs {
-      display: flex;
-      background: white;
-      border-radius: 8px;
-      overflow: hidden;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
-      margin-bottom: 20px;
-      border: 1px solid var(--border);
-    }
+/* ---------- Staff ---------- */
+.login{max-width:420px;margin:48px auto}
+.page-head{display:flex;gap:12px;align-items:center;flex-wrap:wrap;margin-bottom:20px}
+.page-head h1{font-size:1.9rem;font-weight:800;margin-right:auto}
+.stats{display:grid;gap:12px;grid-template-columns:repeat(2,1fr);margin-bottom:20px}
+@media (min-width:760px){.stats{grid-template-columns:repeat(4,1fr)}}
+.stat{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:14px 16px}
+.stat b{display:block;font:800 1.9rem/1.1 var(--font-head)}
+.stat span{color:var(--muted);font-size:.88rem}
+.stat.lost{border-top:4px solid var(--brand)}.stat.found{border-top:4px solid var(--green)}
+.stat.matched{border-top:4px solid #d49a2e}.stat.claimed{border-top:4px solid var(--line-strong)}
+.toolbar{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:14px;align-items:center}
+.seg{display:inline-flex;background:var(--surface);border:1px solid var(--line);border-radius:999px;padding:3px}
+.seg button{border:0;background:transparent;padding:6px 14px;border-radius:999px;font-weight:600;font-size:.9rem;color:var(--muted);cursor:pointer}
+.seg button[aria-pressed="true"]{background:var(--brand);color:#fff}
+.toolbar .input{width:auto;padding:8px 12px;border-radius:999px}
+.toolbar .search{flex:1 1 220px}
+.table-wrap{background:var(--surface);border:1px solid var(--line);border-radius:16px;overflow:hidden}
+.table{width:100%;border-collapse:collapse;font-size:.92rem}
+.table th{text-align:left;font-weight:600;color:var(--muted);font-size:.85rem;padding:12px 14px;background:var(--bg);border-bottom:1px solid var(--line)}
+.table td{padding:14px;border-bottom:1px solid var(--line);vertical-align:top}
+.table tr:last-child td{border-bottom:0}
+.table .item p{color:var(--muted);margin-top:2px;max-width:34ch;overflow-wrap:anywhere}
+.muted{color:var(--muted)}
+.num{font-weight:700;font-variant-numeric:tabular-nums}
+.badge{display:inline-block;font-size:.8rem;font-weight:700;padding:2px 10px;border-radius:999px}
+.badge.lost{background:var(--soft-brand);color:var(--accent-text)}
+.badge.found{background:var(--soft-green);color:var(--green-text)}
+.status-select{padding:6px 10px;border-radius:9px;border:1.5px solid var(--line-strong);background:var(--bg);font-weight:600;font-size:.88rem}
+.actions{white-space:nowrap}
+.actions .btn{margin-right:6px}
+.icon-btn{border:0;background:transparent;cursor:pointer;padding:7px;border-radius:9px;color:var(--muted);vertical-align:middle}
+.icon-btn:hover{background:var(--soft-danger);color:var(--danger)}
+.empty{padding:44px 20px;text-align:center;color:var(--muted)}
+.empty b{display:block;color:var(--ink);font:700 1.15rem var(--font-head);margin-bottom:4px}
+@media (max-width:860px){
+  .table thead{display:none}
+  .table,.table tbody,.table tr,.table td{display:block}
+  .table tr{border-bottom:8px solid var(--bg);padding:10px 14px}
+  .table td{display:flex;gap:12px;justify-content:space-between;padding:6px 0;border:0}
+  .table td::before{content:attr(data-label);color:var(--muted);font-weight:600;flex:0 0 92px}
+  .table .item p{max-width:none}
+  .table td.actions{justify-content:flex-start;align-items:center;padding-top:10px}
+  .table td.actions::before{display:none}
+}
 
-    .nav-item {
-      flex: 1;
-      padding: 14px;
-      text-align: center;
-      background: white;
-      border: none;
-      border-bottom: 3px solid transparent;
-      cursor: pointer;
-      font-weight: 600;
-      color: var(--text-muted);
-      transition: all 0.2s ease;
-    }
+dialog{border:0;border-radius:22px;padding:0;width:min(760px,94vw);max-height:90vh;background:var(--surface);color:var(--ink)}
+dialog::backdrop{background:rgba(8,20,25,.6)}
+.dlg-head{display:flex;gap:12px;align-items:flex-start;padding:22px 24px 14px}
+.dlg-head h2{font-size:1.35rem;margin-right:auto}
+.dlg-head p{color:var(--muted);font-size:.9rem;margin-top:3px}
+.dlg-body{padding:0 24px 24px;overflow:auto;max-height:calc(90vh - 100px);display:grid;gap:14px}
+.cand .who{background:var(--bg);border-radius:10px;padding:10px 12px;font-size:.9rem;margin:10px 0}
+.cand .btns{display:flex;gap:8px;flex-wrap:wrap}
 
-    .nav-item.active {
-      color: var(--primary);
-      border-bottom-color: var(--primary);
-      background: #f0f7f7;
-    }
+.toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:11px 18px;border-radius:12px;font-weight:600;z-index:50;box-shadow:0 8px 24px rgba(0,0,0,.25)}
+.toast.err{background:var(--danger);color:#fff}
+footer{text-align:center;color:var(--muted);font-size:.82rem;padding:0 20px 36px}
 
-    .tab-content {
-      display: none;
-    }
-
-    .tab-content.active {
-      display: block;
-    }
-
-    /* Form Container */
-    .card {
-      background: var(--card-bg);
-      padding: 24px;
-      border-radius: 8px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.04);
-      border: 1px solid var(--border);
-      margin-bottom: 24px;
-    }
-
-    .section-title {
-      font-size: 1.1rem;
-      color: var(--primary);
-      margin-bottom: 16px;
-      padding-bottom: 8px;
-      border-bottom: 2px solid #eef2f5;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-    }
-
-    /* Form Layout Grid */
-    .form-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 16px;
-    }
-
-    .form-group {
-      display: flex;
-      flex-direction: column;
-      gap: 6px;
-    }
-
-    .form-group.full-width {
-      grid-column: span 2;
-    }
-
-    label {
-      font-size: 0.88rem;
-      font-weight: 600;
-      color: var(--text-main);
-    }
-
-    input, select, textarea {
-      padding: 10px 12px;
-      border: 1px solid var(--border);
-      border-radius: 6px;
-      font-size: 0.95rem;
-      background: #fafafa;
-      transition: border-color 0.2s;
-    }
-
-    input:focus, select:focus, textarea:focus {
-      outline: none;
-      border-color: var(--primary);
-      background: #ffffff;
-    }
-
-    textarea {
-      resize: vertical;
-      min-height: 80px;
-    }
-
-    /* Radio Group Styling */
-    .radio-group {
-      display: flex;
-      gap: 20px;
-      align-items: center;
-      padding: 8px 0;
-    }
-
-    .radio-label {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      font-weight: normal;
-      cursor: pointer;
-    }
-
-    /* Privacy Banner */
-    .privacy-banner {
-      background: #eef6f8;
-      border-left: 4px solid var(--primary);
-      padding: 12px 16px;
-      border-radius: 4px;
-      margin: 20px 0;
-      font-size: 0.82rem;
-      color: #334e58;
-    }
-
-    /* Submit Button */
-    .btn-submit {
-      width: 100%;
-      padding: 14px;
-      background-color: var(--primary);
-      color: white;
-      border: none;
-      border-radius: 6px;
-      font-size: 1rem;
-      font-weight: 600;
-      cursor: pointer;
-      transition: background 0.2s;
-    }
-
-    .btn-submit:hover {
-      background-color: var(--primary-dark);
-    }
-
-    .btn-submit:disabled {
-      background-color: #a0b4b9;
-      cursor: not-allowed;
-    }
-
-    /* Match Result Card Layout */
-    .match-card {
-      border: 1px solid var(--border);
-      border-left: 5px solid var(--primary);
-      border-radius: 6px;
-      padding: 18px;
-      margin-bottom: 16px;
-      background: #fff;
-    }
-
-    .match-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 12px;
-    }
-
-    .match-score {
-      font-size: 1rem;
-      font-weight: 700;
-      color: var(--primary);
-    }
-
-    .badge {
-      display: inline-block;
-      padding: 4px 8px;
-      border-radius: 4px;
-      font-size: 0.75rem;
-      font-weight: 700;
-      text-transform: uppercase;
-    }
-
-    .badge-high {
-      background: #e8f5e9;
-      color: #2e7d32;
-    }
-
-    .badge-med {
-      background: #fff8e1;
-      color: #f57f17;
-    }
-
-    .breakdown-grid {
-      display: grid;
-      grid-template-columns: repeat(5, 1fr);
-      gap: 8px;
-      background: #f8f9fa;
-      padding: 10px;
-      border-radius: 6px;
-      margin-top: 12px;
-      font-size: 0.75rem;
-      text-align: center;
-    }
-
-    .breakdown-item strong {
-      display: block;
-      color: var(--primary);
-    }
-
-    @media (max-width: 600px) {
-      .form-grid {
-        grid-template-columns: 1fr;
-      }
-      .form-group.full-width {
-        grid-column: span 1;
-      }
-      .breakdown-grid {
-        grid-template-columns: repeat(2, 1fr);
-      }
-    }
-  </style>
+@media (max-width:560px){
+  main{padding-top:24px}
+  .tile{padding:16px 16px;min-height:104px}
+  .tile-found{padding-left:34px}
+  .tile-title{font-size:1.02rem}.tile-sub{font-size:.78rem}
+  .tile-lost::after{width:40px;height:40px;margin-top:-20px;right:-20px}
+  .card{padding:20px 16px}
+  .brand small{display:none}
+  .nav a{padding:8px 12px}
+  .nav .long{display:none}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation-duration:.01ms!important}}
+</style>
 </head>
 <body>
 
-  <!-- Top Header Navigation -->
-  <header>
-    <div class="brand">
-      <img src="Tugma.png" alt="Tugma Logo" onerror="this.style.display='none'">
-      <div>
-        <h1>Tugma</h1>
-        <p>Barangay Sta. Rita Lost & Found System</p>
-      </div>
-    </div>
-    <div class="user-profile">
-      Staff: <strong>Authorized Operator</strong>
-    </div>
-  </header>
+<header class="topbar">
+  <div class="topbar-in">
+    <a class="brand" href="#/">
+      <img src="Tugma.png" alt="">
+      <span><b>Tugma</b><small>Barangay Sta. Rita lost and found</small></span>
+    </a>
+    <nav class="nav" aria-label="Main">
+      <a href="#/" id="nav-report">Report<span class="long"> an item</span></a>
+      <a href="#/staff" id="nav-staff">Staff</a>
+    </nav>
+  </div>
+</header>
 
-  <div class="container">
-    
-    <!-- Tab Controls -->
-    <div class="nav-tabs">
-      <button class="nav-item active" onclick="switchTab('report', this)">Submit Report</button>
-      <button class="nav-item" onclick="switchTab('matches', this)">Match Results</button>
-    </div>
+<!-- ======================= PUBLIC: REPORT ======================= -->
+<main id="view-report">
+  <section class="hero" id="hero">
+    <h1>Lost it? Found it? Tell us.</h1>
+    <p>Report an item and we compare it against everything the barangay has on file. Matches appear right away.</p>
+  </section>
 
-    <!-- TAB 1: File Item Report -->
-    <div id="report" class="tab-content active">
-      <div class="card">
-        
-        <form id="reportForm" onsubmit="event.preventDefault(); submitAndMatch(event);">
-          
-          <!-- Section 1: Classification -->
-          <div class="section-title">
-            <span>Item Classification Parameters</span>
-          </div>
-
-          <div class="form-grid">
-            <div class="form-group full-width">
-              <label>Report Type</label>
-              <div class="radio-group">
-                <label class="radio-label">
-                  <input type="radio" name="reportType" value="lost" checked> Lost Item Report
-                </label>
-                <label class="radio-label">
-                  <input type="radio" name="reportType" value="found"> Found Item Report
-                </label>
-              </div>
-            </div>
-
-            <div class="form-group">
-              <label for="category">Item Category (30% Weight)</label>
-              <select id="category" required>
-                <option value="">Select Category...</option>
-                <option value="Electronics">Electronics (Phone, Laptop, Charger)</option>
-                <option value="Personal Items">Personal Items (Wallet, Bag, Keys)</option>
-                <option value="Documents">Documents / Cards (ID, License, Cards)</option>
-                <option value="Clothing">Clothing & Accessories (Jewelry, Glasses, Watch)</option>
-                <option value="Others">Others</option>
-              </select>
-            </div>
-
-            <div class="form-group">
-              <label for="color">Primary Color (20% Weight)</label>
-              <input type="text" id="color" placeholder="e.g. Black, Navy Blue, Silver" required />
-            </div>
-
-            <div class="form-group full-width">
-              <label for="description">Detailed Description (30% Levenshtein Text Match)</label>
-              <textarea id="description" placeholder="Describe unique features, markings, brand name, or contents inside..." required></textarea>
-            </div>
-
-            <div class="form-group">
-              <label for="location">Location Lost / Found (10% Proximity)</label>
-              <input type="text" id="location" placeholder="e.g. Sta. Rita Public Market, High School" required />
-            </div>
-
-            <div class="form-group">
-              <label for="date">Incident Date (10% Temporal Proximity)</label>
-              <input type="date" id="date" required />
-            </div>
-          </div>
-
-          <!-- Section 2: Data Privacy Safeguarded Resident Information -->
-          <div class="section-title" style="margin-top: 24px;">
-            <span>Resident Information (Staff Verification Only)</span>
-          </div>
-
-          <div class="form-grid">
-            <div class="form-group">
-              <label for="reporterName">Resident Full Name</label>
-              <input type="text" id="reporterName" placeholder="e.g. Juan Dela Cruz" required />
-            </div>
-
-            <div class="form-group">
-              <label for="reporterContact">Contact Number</label>
-              <input type="tel" id="reporterContact" placeholder="e.g. 09171234567" required />
-            </div>
-          </div>
-
-          <!-- Privacy Safeguard Banner -->
-          <div class="privacy-banner">
-            <strong>🔒 Republic Act No. 10173 Compliance:</strong> Resident names and contact details are stored securely in the local database for staff verification during claiming. They are strictly stripped and excluded from match search feeds.
-          </div>
-
-          <button type="button" id="submitBtn" class="btn-submit" onclick="submitAndMatch(event)">
-            Execute Rule-Based Matching Engine
-          </button>
-
-        </form>
-      </div>
-    </div>
-
-    <!-- TAB 2: Match Results Explorer -->
-    <div id="matches" class="tab-content">
-      <div class="card">
-        <div class="section-title">
-          <span>Ranked Similarity Matches</span>
-        </div>
-        
-        <div id="resultsContainer">
-          <p style="color: var(--text-muted); text-align: center; padding: 20px 0;">
-            No search has been executed yet. Submit a report to run the weighted similarity algorithm.
-          </p>
-        </div>
-      </div>
-    </div>
-
+  <div class="pair" id="pair" role="radiogroup" aria-label="What happened?">
+    <button type="button" class="tile tile-lost" role="radio" aria-checked="true" data-type="lost">
+      <span class="tile-title">I lost something</span>
+      <span class="tile-sub">We'll look for a match</span>
+    </button>
+    <button type="button" class="tile tile-found" role="radio" aria-checked="false" data-type="found">
+      <span class="tile-title">I found something</span>
+      <span class="tile-sub">Help it reach its owner</span>
+    </button>
   </div>
 
-  <script>
-    // Tab Switcher Logic
-    function switchTab(tabId, element) {
-      document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
-      document.querySelectorAll('.nav-item').forEach(nav => nav.classList.remove('active'));
-      
-      const targetTab = document.getElementById(tabId);
-      if (targetTab) targetTab.classList.add('active');
-      if (element) element.classList.add('active');
+  <form id="report-form" class="card" novalidate>
+    <h2 id="form-title">Tell us what you lost</h2>
+    <div id="form-error" class="form-error" role="alert" hidden></div>
+
+    <fieldset class="field" id="f-category">
+      <legend>What kind of item is it?</legend>
+      <div class="chips" id="chips"></div>
+      <p class="error" hidden></p>
+    </fieldset>
+
+    <div class="grid2">
+      <div class="field" id="f-color">
+        <label for="color">Main color</label>
+        <input class="input" id="color" maxlength="50" autocomplete="off" placeholder="Black, navy blue, silver">
+        <p class="error" hidden></p>
+      </div>
+      <div class="field" id="f-report_date">
+        <label for="report_date" id="l-date">When did you lose it?</label>
+        <input class="input" id="report_date" type="date">
+        <p class="error" hidden></p>
+      </div>
+    </div>
+
+    <div class="field" id="f-description">
+      <label for="description">Describe the item</label>
+      <textarea class="input" id="description" maxlength="2000" placeholder="Brand, size, scratches, stickers, what was inside"></textarea>
+      <p class="hint" id="desc-hint"></p>
+      <p class="error" hidden></p>
+    </div>
+
+    <div class="field" id="f-location">
+      <label for="location" id="l-where">Where did you lose it?</label>
+      <input class="input" id="location" maxlength="100" autocomplete="off" placeholder="Covered court, public market, chapel">
+      <p class="error" hidden></p>
+    </div>
+
+    <div class="grid2">
+      <div class="field" id="f-reporter_name">
+        <label for="reporter_name">Your full name</label>
+        <input class="input" id="reporter_name" maxlength="100" autocomplete="name">
+        <p class="error" hidden></p>
+      </div>
+      <div class="field" id="f-reporter_contact">
+        <label for="reporter_contact">Your mobile number</label>
+        <input class="input" id="reporter_contact" maxlength="20" inputmode="tel" autocomplete="tel" placeholder="09XX XXX XXXX">
+        <p class="error" hidden></p>
+      </div>
+    </div>
+
+    <div class="privacy">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>
+      <p>Only barangay staff can see your name and number, and only to verify claims. They never appear in match results (Data Privacy Act, RA 10173).</p>
+    </div>
+
+    <button class="btn block" id="submit-btn" type="submit"><span id="submit-label">Submit lost report</span></button>
+  </form>
+
+  <section id="result" hidden aria-live="polite"></section>
+</main>
+
+<!-- ======================= STAFF ======================= -->
+<main id="view-staff" class="wide" hidden>
+  <section id="staff-login" class="card login">
+    <h2>Staff sign in</h2>
+    <p class="muted" style="margin:-8px 0 18px">Enter the staff passcode to see reports and contact details.</p>
+    <div id="login-error" class="form-error" role="alert" hidden></div>
+    <form id="login-form">
+      <div class="field">
+        <label for="passcode">Passcode</label>
+        <input class="input" id="passcode" type="password" autocomplete="current-password" required>
+      </div>
+      <button class="btn block" type="submit" id="login-btn">Sign in</button>
+    </form>
+  </section>
+
+  <section id="staff-app" hidden>
+    <div class="page-head">
+      <h1>Reports</h1>
+      <button class="btn ghost small" id="refresh-btn" type="button">Refresh</button>
+      <button class="btn ghost small" id="signout-btn" type="button">Sign out</button>
+    </div>
+
+    <div class="stats" id="stats"></div>
+
+    <div class="toolbar">
+      <div class="seg" role="group" aria-label="Filter by type" id="seg-type">
+        <button type="button" data-v="all" aria-pressed="true">All</button>
+        <button type="button" data-v="lost" aria-pressed="false">Lost</button>
+        <button type="button" data-v="found" aria-pressed="false">Found</button>
+      </div>
+      <select class="input" id="status-filter" aria-label="Filter by status">
+        <option value="all">Any status</option>
+        <option value="unmatched">Unmatched</option>
+        <option value="matched">Matched</option>
+        <option value="claimed">Claimed</option>
+      </select>
+      <input class="input search" id="search" type="search" placeholder="Search reports" aria-label="Search reports">
+    </div>
+
+    <div class="table-wrap">
+      <table class="table">
+        <thead><tr><th>No.</th><th>Type</th><th>Item</th><th>Where and when</th><th>Reporter</th><th>Status</th><th></th></tr></thead>
+        <tbody id="rows"></tbody>
+      </table>
+      <div class="empty" id="empty" hidden></div>
+    </div>
+  </section>
+</main>
+
+<dialog id="match-dialog" aria-labelledby="dlg-title">
+  <div class="dlg-head">
+    <div><h2 id="dlg-title">Possible matches</h2><p id="dlg-sub"></p></div>
+    <button class="btn ghost small" id="dlg-close" type="button">Close</button>
+  </div>
+  <div class="dlg-body" id="dlg-body"></div>
+</dialog>
+
+<footer>Tugma is a test system for Barangay Sta. Rita.</footer>
+
+<script>
+(function () {
+  'use strict';
+
+  /* ---------- helpers ---------- */
+  const $ = (s, r = document) => r.querySelector(s);
+  const $$ = (s, r = document) => Array.from(r.querySelectorAll(s));
+  const esc = v => String(v ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+  const todayStr = () => new Date(Date.now() - new Date().getTimezoneOffset() * 60000).toISOString().slice(0, 10);
+  const fmtDate = d => d ? new Date(d + 'T00:00:00').toLocaleDateString('en-PH', { month: 'short', day: 'numeric', year: 'numeric' }) : '';
+
+  async function api(path, body, headers = {}) {
+    if (location.protocol === 'file:') {
+      throw new Error('This page was opened as a local file. Open your Vercel link instead, or run "npx vercel dev".');
+    }
+    let res;
+    try {
+      res = await fetch(path, { method: 'POST', headers: { 'Content-Type': 'application/json', ...headers }, body: JSON.stringify(body) });
+    } catch (e) {
+      throw new Error('Cannot reach the server. Check your internet connection and try again.');
+    }
+    const text = await res.text();
+    let data = null;
+    try { data = JSON.parse(text); } catch (e) { /* not JSON */ }
+    if (!res.ok) {
+      const err = new Error((data && data.message) || ('Server error (' + res.status + ').'));
+      err.status = res.status;
+      throw err;
+    }
+    return data;
+  }
+
+  let toastTimer;
+  function toast(msg, isErr) {
+    $$('.toast').forEach(t => t.remove());
+    const t = document.createElement('div');
+    t.className = 'toast' + (isErr ? ' err' : '');
+    t.setAttribute('role', 'status');
+    t.textContent = msg;
+    document.body.appendChild(t);
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => t.remove(), 3200);
+  }
+
+  const CATEGORIES = [
+    ['Electronics', 'Electronics', 'Phone, laptop, charger'],
+    ['Personal Items', 'Personal items', 'Wallet, bag, keys'],
+    ['Documents', 'Documents and cards', 'ID, license, ATM card'],
+    ['Clothing', 'Clothing and accessories', 'Jewelry, glasses, watch'],
+    ['Others', 'Others', 'Anything else']
+  ];
+  const PARTS = [['category', 'Category', 30], ['color', 'Color', 20], ['description', 'Description', 30], ['location', 'Location', 10], ['date', 'Date', 10]];
+
+  function meters(b) {
+    return '<ul class="meters">' + PARTS.map(([k, label, max]) => {
+      const v = (b && b[k]) || 0;
+      return '<li><span>' + label + '</span><span class="bar"><i style="width:' + Math.round(v / max * 100) + '%"></i></span><span class="pts">' + v + '/' + max + '</span></li>';
+    }).join('') + '</ul>';
+  }
+  const tierClass = t => t === 'High' ? '' : t === 'Medium' ? 'med' : 'low';
+  const ring = s => '<div class="ring" style="--p:' + s + '" role="img" aria-label="' + s + ' percent match"><b>' + s + '%</b></div>';
+
+  /* ---------- routing ---------- */
+  function route() {
+    const staff = location.hash.startsWith('#/staff');
+    $('#view-report').hidden = staff;
+    $('#view-staff').hidden = !staff;
+    $('#nav-report').toggleAttribute('aria-current', !staff);
+    $('#nav-staff').toggleAttribute('aria-current', staff);
+    if (!staff) $('#nav-report').setAttribute('aria-current', 'page'); else $('#nav-report').removeAttribute('aria-current');
+    if (staff) $('#nav-staff').setAttribute('aria-current', 'page'); else $('#nav-staff').removeAttribute('aria-current');
+    document.title = staff ? 'Staff: Tugma' : 'Tugma: Lost and Found, Barangay Sta. Rita';
+    if (staff) initStaff();
+    window.scrollTo(0, 0);
+  }
+  window.addEventListener('hashchange', route);
+
+  /* =====================================================
+     PUBLIC: report form
+     ===================================================== */
+  let reportType = 'lost';
+  const COPY = {
+    lost: {
+      title: 'Tell us what you lost', where: 'Where did you lose it?', when: 'When did you lose it?',
+      hint: 'Brand, size, marks and what was inside help us find the right match.',
+      submit: 'Submit lost report', busy: 'Searching for matches...'
+    },
+    found: {
+      title: 'Tell us what you found', where: 'Where did you find it?', when: 'When did you find it?',
+      hint: 'Describe it, but keep one detail to yourself, like a name inside or a lock screen photo. Staff will ask the owner for it.',
+      submit: 'Submit found report', busy: 'Saving report...'
+    }
+  };
+
+  $('#chips').innerHTML = CATEGORIES.map(([v, label, sub]) =>
+    '<label class="chip"><input type="radio" name="category" value="' + esc(v) + '"><span><b>' + esc(label) + '</b><small>' + esc(sub) + '</small></span></label>'
+  ).join('');
+
+  function applyType() {
+    const c = COPY[reportType];
+    $('#form-title').textContent = c.title;
+    $('#l-where').textContent = c.where;
+    $('#l-date').textContent = c.when;
+    $('#desc-hint').textContent = c.hint;
+    $('#submit-label').textContent = c.submit;
+    $$('.tile').forEach(t => t.setAttribute('aria-checked', String(t.dataset.type === reportType)));
+    $('#submit-btn').classList.toggle('green', reportType === 'found');
+  }
+  $$('.tile').forEach(t => t.addEventListener('click', () => { reportType = t.dataset.type; applyType(); $('#result').hidden = true; $('#report-form').hidden = false; $('#hero').hidden = false; }));
+
+  function resetForm() {
+    $('#report-form').reset();
+    $('#report_date').value = todayStr();
+    $$('.field.bad').forEach(f => f.classList.remove('bad'));
+    $$('.field .error').forEach(e => e.hidden = true);
+    $('#form-error').hidden = true;
+  }
+  $('#report_date').max = todayStr();
+  $('#report_date').value = todayStr();
+  applyType();
+
+  function setErr(id, msg) {
+    const f = $('#f-' + id), e = $('.error', f);
+    f.classList.toggle('bad', !!msg);
+    e.hidden = !msg;
+    e.textContent = msg || '';
+  }
+
+  function readForm() {
+    const cat = $('input[name="category"]:checked');
+    return {
+      report_type: reportType,
+      category: cat ? cat.value : '',
+      color: $('#color').value.trim(),
+      description: $('#description').value.trim(),
+      location: $('#location').value.trim(),
+      report_date: $('#report_date').value,
+      reporter_name: $('#reporter_name').value.trim(),
+      reporter_contact: $('#reporter_contact').value.trim()
+    };
+  }
+
+  function validate(r) {
+    const errs = {};
+    if (!r.category) errs.category = 'Choose the kind of item.';
+    if (!r.color) errs.color = 'Enter the main color.';
+    if (!r.report_date) errs.report_date = 'Choose a date.';
+    else if (r.report_date > todayStr()) errs.report_date = 'The date cannot be in the future.';
+    if (!r.description) errs.description = 'Describe the item so we can match it.';
+    if (!r.location) errs.location = 'Enter the place.';
+    if (!r.reporter_name) errs.reporter_name = 'Enter your full name.';
+    if (!/^[0-9+\-\s()]{7,20}$/.test(r.reporter_contact)) errs.reporter_contact = 'Enter a valid mobile number, like 0912 345 6789.';
+    ['category', 'color', 'report_date', 'description', 'location', 'reporter_name', 'reporter_contact'].forEach(k => setErr(k, errs[k]));
+    return errs;
+  }
+
+  $('#report-form').addEventListener('submit', async e => {
+    e.preventDefault();
+    $('#form-error').hidden = true;
+    const r = readForm();
+    const errs = validate(r);
+    const first = Object.keys(errs)[0];
+    if (first) {
+      const target = first === 'category' ? $('input[name="category"]') : $('#' + first);
+      target.focus();
+      return;
     }
 
-    // Escape user-supplied text before inserting into HTML
-    function esc(value) {
-      return String(value ?? '').replace(/[&<>"']/g, ch => ({
-        '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
-      }[ch]));
+    const btn = $('#submit-btn');
+    btn.disabled = true;
+    btn.innerHTML = '<span class="spinner"></span><span>' + COPY[reportType].busy + '</span>';
+    try {
+      const data = await api('/api/match', { report: r });
+      showResult(data);
+    } catch (err) {
+      const box = $('#form-error');
+      box.textContent = err.message;
+      box.hidden = false;
+      box.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    } finally {
+      btn.disabled = false;
+      btn.innerHTML = '<span id="submit-label">' + COPY[reportType].submit + '</span>';
     }
+  });
 
-    // Client-side execution script
-    async function submitAndMatch(event) {
-      if (event) event.preventDefault();
+  function showResult(data) {
+    const res = $('#result');
+    const ref = '<span class="refno">#' + esc(data.reportId) + '</span>';
+    const check = '<div class="done-icon"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></div>';
+    let html = '';
 
-      const btn = document.getElementById('submitBtn');
-      if (!btn) return;
+    if (data.reportType === 'found') {
+      html = '<div class="card"><div class="done">' + check +
+        '<div><h2>Found report submitted</h2><p>Thank you. Your report number is ' + ref + '. Keep it handy.</p></div></div>' +
+        '<div class="next"><h3>What to do with the item</h3><p>Bring it to the barangay hall and give staff your report number. They will hold it safely and verify the owner before releasing it.</p></div>' +
+        '<div class="actions-row"><button class="btn" data-again>Report another item</button></div></div>';
+    } else if (data.totalMatches > 0) {
+      html = '<div class="done">' + check +
+        '<div><h2>' + data.totalMatches + (data.totalMatches === 1 ? ' possible match' : ' possible matches') + '</h2><p>Lost report submitted. Your report number is ' + ref + '</p></div></div>' +
+        '<div class="matches">' + data.matches.map(m => {
+          const f = m.foundItem;
+          return '<article class="match ' + tierClass(m.confidenceTier) + '">' + ring(m.matchScore) +
+            '<div><h3>' + esc(f.category) + ', ' + esc(f.color) + '<span class="tier">' + esc(m.confidenceTier) + '</span></h3>' +
+            '<p class="meta">Found item #' + esc(f.id) + ' &middot; ' + esc(f.location) + ' &middot; ' + esc(fmtDate(f.report_date)) + '</p>' +
+            '<p class="desc">' + esc(f.description) + '</p>' + meters(m.scoreBreakdown) + '</div></article>';
+        }).join('') + '</div>' +
+        '<div class="next"><h3>How to claim</h3><p>Go to the barangay hall with a valid ID and your report number ' + ref + '. Staff will ask you about details only the owner would know before releasing the item.</p></div>' +
+        '<div class="actions-row"><button class="btn ghost" data-again>Report another item</button></div>';
+    } else {
+      html = '<div class="card"><div class="done">' + check +
+        '<div><h2>Report submitted, no match yet</h2><p>Your report number is ' + ref + '. Nothing on file looks like your item right now.</p></div></div>' +
+        '<div class="next"><h3>What happens next</h3><p>Staff keep your report on file and compare it with every new found item. You can also visit the barangay hall and give your report number to check in person.</p></div>' +
+        '<div class="actions-row"><button class="btn" data-again>Report another item</button></div></div>';
+    }
+    res.innerHTML = html;
+    res.hidden = false;
+    $('#report-form').hidden = true;
+    $('#hero').hidden = true; $('#pair').hidden = true;
+    res.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    res.querySelector('[data-again]').addEventListener('click', () => {
+      resetForm(); res.hidden = true; $('#report-form').hidden = false; $('#hero').hidden = false; $('#pair').hidden = false; window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+  }
 
-      const getValue = (id) => {
-        const el = document.getElementById(id);
-        return el ? el.value.trim() : '';
-      };
+  /* =====================================================
+     STAFF
+     ===================================================== */
+  let staffPass = null;
+  try { staffPass = sessionStorage.getItem('tugma_staff'); } catch (e) { /* storage blocked */ }
+  let reports = [];
+  const filter = { type: 'all', status: 'all', q: '' };
 
-      const category = getValue('category');
-      const color = getValue('color');
-      const description = getValue('description');
-      const location = getValue('location');
-      const reportDate = getValue('date') || new Date().toISOString().split('T')[0];
-      const reporterName = getValue('reporterName') || "Barangay Resident";
-      const reporterContact = getValue('reporterContact') || "09000000000";
+  const staffApi = (action, payload = {}) => api('/api/staff', Object.assign({ action }, payload), { 'x-staff-passcode': staffPass || '' });
 
-      if (!category || !description || !color) {
-        alert("Please complete the required Category, Color, and Description fields.");
+  function signOut(msg) {
+    staffPass = null;
+    try { sessionStorage.removeItem('tugma_staff'); } catch (e) { /* ignore */ }
+    reports = [];
+    $('#staff-app').hidden = true;
+    $('#staff-login').hidden = false;
+    $('#passcode').value = '';
+    const box = $('#login-error');
+    box.hidden = !msg;
+    box.textContent = msg || '';
+  }
+
+  function initStaff() {
+    if (staffPass) {
+      $('#staff-login').hidden = true;
+      $('#staff-app').hidden = false;
+      loadReports();
+    } else {
+      signOut();
+      setTimeout(() => $('#passcode').focus(), 0);
+    }
+  }
+
+  $('#login-form').addEventListener('submit', async e => {
+    e.preventDefault();
+    const btn = $('#login-btn');
+    staffPass = $('#passcode').value;
+    btn.disabled = true; btn.textContent = 'Checking...';
+    try {
+      await staffApi('login');
+      try { sessionStorage.setItem('tugma_staff', staffPass); } catch (err) { /* ignore */ }
+      $('#login-error').hidden = true;
+      $('#staff-login').hidden = true;
+      $('#staff-app').hidden = false;
+      loadReports();
+    } catch (err) {
+      signOut(err.status === 401 ? 'That passcode is not correct. Try again.' : err.message);
+    } finally {
+      btn.disabled = false; btn.textContent = 'Sign in';
+    }
+  });
+
+  $('#signout-btn').addEventListener('click', () => signOut());
+  $('#refresh-btn').addEventListener('click', () => loadReports(true));
+
+  async function loadReports(showToast) {
+    try {
+      const data = await staffApi('list');
+      reports = data.reports || [];
+      renderStaff();
+      if (showToast) toast('Reports refreshed');
+    } catch (err) {
+      if (err.status === 401) return signOut('Your session ended. Sign in again.');
+      toast(err.message, true);
+    }
+  }
+
+  const stOf = r => r.status || 'unmatched';
+
+  function renderStats() {
+    const c = {
+      lost: reports.filter(r => r.report_type === 'lost' && stOf(r) !== 'claimed').length,
+      found: reports.filter(r => r.report_type === 'found' && stOf(r) !== 'claimed').length,
+      matched: reports.filter(r => stOf(r) === 'matched').length,
+      claimed: reports.filter(r => stOf(r) === 'claimed').length
+    };
+    $('#stats').innerHTML =
+      '<div class="stat lost"><b>' + c.lost + '</b><span>Lost, still open</span></div>' +
+      '<div class="stat found"><b>' + c.found + '</b><span>Found, still open</span></div>' +
+      '<div class="stat matched"><b>' + c.matched + '</b><span>Matched</span></div>' +
+      '<div class="stat claimed"><b>' + c.claimed + '</b><span>Claimed</span></div>';
+  }
+
+  function rowHtml(r) {
+    const st = stOf(r);
+    return '<tr data-id="' + esc(r.id) + '">' +
+      '<td data-label="No."><span class="num">#' + esc(r.id) + '</span></td>' +
+      '<td data-label="Type"><span class="badge ' + esc(r.report_type) + '">' + (r.report_type === 'lost' ? 'Lost' : 'Found') + '</span></td>' +
+      '<td data-label="Item" class="item"><div><b>' + esc(r.category) + '</b>, ' + esc(r.color) + '<p>' + esc(r.description) + '</p></div></td>' +
+      '<td data-label="Where and when"><div>' + esc(r.location) + '<br><span class="muted">' + esc(fmtDate(r.report_date)) + '</span></div></td>' +
+      '<td data-label="Reporter"><div>' + esc(r.reporter_name) + '<br><a href="tel:' + esc(r.reporter_contact) + '">' + esc(r.reporter_contact) + '</a></div></td>' +
+      '<td data-label="Status"><select class="status-select" data-act="status" aria-label="Status of report ' + esc(r.id) + '">' +
+        ['unmatched', 'matched', 'claimed'].map(s => '<option value="' + s + '"' + (s === st ? ' selected' : '') + '>' + s[0].toUpperCase() + s.slice(1) + '</option>').join('') + '</select></td>' +
+      '<td class="actions"><button class="btn ghost small" data-act="matches">Find matches</button>' +
+        '<button class="icon-btn" data-act="delete" aria-label="Delete report ' + esc(r.id) + '"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 6h18M8 6V4h8v2M6 6l1 14h10l1-14M10 10v6M14 10v6"/></svg></button></td>' +
+      '</tr>';
+  }
+
+  function renderStaff() {
+    renderStats();
+    const q = filter.q.trim().toLowerCase();
+    const list = reports.filter(r =>
+      (filter.type === 'all' || r.report_type === filter.type) &&
+      (filter.status === 'all' || stOf(r) === filter.status) &&
+      (!q || [r.id, r.category, r.color, r.description, r.location, r.reporter_name, r.reporter_contact].join(' ').toLowerCase().includes(q))
+    );
+    $('#rows').innerHTML = list.map(rowHtml).join('');
+    const empty = $('#empty');
+    empty.hidden = list.length > 0;
+    if (!list.length) {
+      empty.innerHTML = reports.length
+        ? '<b>No reports match these filters</b>Try a different type, status, or search.'
+        : '<b>No reports yet</b>Reports submitted on the public page will appear here.';
+    }
+  }
+
+  $$('#seg-type button').forEach(b => b.addEventListener('click', () => {
+    filter.type = b.dataset.v;
+    $$('#seg-type button').forEach(x => x.setAttribute('aria-pressed', String(x === b)));
+    renderStaff();
+  }));
+  $('#status-filter').addEventListener('change', e => { filter.status = e.target.value; renderStaff(); });
+  $('#search').addEventListener('input', e => { filter.q = e.target.value; renderStaff(); });
+
+  async function setStatus(ids, status) {
+    try {
+      await staffApi('update', { ids, status });
+      reports.forEach(r => { if (ids.includes(r.id)) r.status = status; });
+      renderStaff();
+      toast('Status changed to ' + status);
+    } catch (err) {
+      if (err.status === 401) return signOut('Your session ended. Sign in again.');
+      toast(err.message, true);
+      renderStaff();
+    }
+  }
+
+  $('#rows').addEventListener('change', e => {
+    const sel = e.target.closest('[data-act="status"]');
+    if (sel) setStatus([Number(sel.closest('tr').dataset.id)], sel.value);
+  });
+
+  $('#rows').addEventListener('click', async e => {
+    const btn = e.target.closest('button[data-act]');
+    if (!btn) return;
+    const id = Number(btn.closest('tr').dataset.id);
+    if (btn.dataset.act === 'matches') return openMatches(id);
+    if (btn.dataset.act === 'delete') {
+      if (!confirm('Delete report #' + id + '? This cannot be undone.')) return;
+      try {
+        await staffApi('delete', { id });
+        reports = reports.filter(r => r.id !== id);
+        renderStaff();
+        toast('Report #' + id + ' deleted');
+      } catch (err) {
+        if (err.status === 401) return signOut('Your session ended. Sign in again.');
+        toast(err.message, true);
+      }
+    }
+  });
+
+  /* ---------- matches dialog ---------- */
+  const dlg = $('#match-dialog');
+  $('#dlg-close').addEventListener('click', () => dlg.close());
+  dlg.addEventListener('click', e => { if (e.target === dlg) dlg.close(); });
+
+  async function openMatches(id) {
+    $('#dlg-title').textContent = 'Possible matches for #' + id;
+    $('#dlg-sub').textContent = 'Checking...';
+    $('#dlg-body').innerHTML = '';
+    dlg.showModal();
+    try {
+      const data = await staffApi('matches', { id });
+      const b = data.report;
+      $('#dlg-sub').textContent = (b.report_type === 'lost' ? 'Lost: ' : 'Found: ') + b.category + ', ' + b.color + '. Showing candidates scoring 50% or higher.';
+      if (!data.candidates.length) {
+        $('#dlg-body').innerHTML = '<div class="empty"><b>No candidates yet</b>Nothing on file scores 50% or higher against this report.</div>';
         return;
       }
-
-      // UI Loading State
-      const originalText = btn.innerText;
-      btn.innerText = "Executing Algorithmic Matching...";
-      btn.disabled = true;
-
-      const payload = {
-        lostReport: {
-          category,
-          color,
-          description,
-          location,
-          report_date: reportDate,
-          reporter_name: reporterName,
-          reporter_contact: reporterContact
-        }
-      };
-
-      try {
-        const response = await fetch('/api/match', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(payload)
-        });
-
-        if (!response.ok) {
-          const errorText = await response.text();
-          throw new Error(`Server status ${response.status}: ${errorText}`);
-        }
-
-        const data = await response.json();
-        const resultsDiv = document.getElementById('resultsContainer');
-
-        if (resultsDiv) {
-          resultsDiv.innerHTML = '';
-
-          if (data.matches && data.matches.length > 0) {
-            data.matches.forEach(item => {
-              const badgeClass = item.matchScore >= 85 ? 'badge-high' : 'badge-med';
-              const tierLabel = item.matchScore >= 85 ? 'High Confidence Match' : 'Medium Confidence Match';
-
-              resultsDiv.innerHTML += `
-                <div class="match-card">
-                  <div class="match-header">
-                    <span class="match-score">${esc(item.matchScore)}% Weighted Match Score</span>
-                    <span class="badge ${badgeClass}">${tierLabel}</span>
-                  </div>
-                  <p style="margin-bottom: 4px;"><strong>Category:</strong> ${esc(item.foundItem.category)} | <strong>Color:</strong> ${esc(item.foundItem.color)}</p>
-                  <p style="margin-bottom: 4px;"><strong>Description:</strong> ${esc(item.foundItem.description)}</p>
-                  <p style="margin-bottom: 8px;"><strong>Location:</strong> ${esc(item.foundItem.location)} | <strong>Date:</strong> ${esc(item.foundItem.report_date)}</p>
-
-                  <div class="breakdown-grid">
-                    <div class="breakdown-item">Category (30%)<strong>${item.scoreBreakdown ? item.scoreBreakdown.category : '—'} / 30</strong></div>
-                    <div class="breakdown-item">Color (20%)<strong>${item.scoreBreakdown ? item.scoreBreakdown.color : '—'} / 20</strong></div>
-                    <div class="breakdown-item">Text Similarity (30%)<strong>${item.scoreBreakdown ? item.scoreBreakdown.description : '—'} / 30</strong></div>
-                    <div class="breakdown-item">Location (10%)<strong>${item.scoreBreakdown ? item.scoreBreakdown.location : '—'} / 10</strong></div>
-                    <div class="breakdown-item">Date (10%)<strong>${item.scoreBreakdown ? item.scoreBreakdown.date : '—'} / 10</strong></div>
-                  </div>
-                </div>
-              `;
-            });
-          } else {
-            resultsDiv.innerHTML = `
-              <div style="padding: 16px; border: 1px solid #dde1e5; border-radius: 6px;">
-                <p><strong>No matches found meeting the threshold (≥ 70%).</strong></p>
-                <p style="font-size: 0.85rem; color: var(--text-muted); margin-top: 4px;">
-                  The report has been saved to the database. Staff will be alerted if a matching item is brought to the barangay hall.
-                </p>
-              </div>
-            `;
-          }
-        }
-
-        // Switch to Match Results View
-        const navItems = document.querySelectorAll('.nav-item');
-        switchTab('matches', navItems[1]);
-
-      } catch (err) {
-        console.error("Match Execution Error:", err);
-        const onFile = location.protocol === 'file:';
-        alert(onFile
-          ? "You opened this page as a local file (file://). Open your Vercel URL (https://...vercel.app) instead, or run 'npx vercel dev' and use http://localhost:3000."
-          : "Matching failed: " + err.message);
-      } finally {
-        btn.innerText = originalText;
-        btn.disabled = false;
-      }
+      $('#dlg-body').innerHTML = data.candidates.map(c => {
+        const it = c.item;
+        return '<article class="match cand ' + tierClass(c.confidenceTier) + '" data-other="' + esc(it.id) + '">' + ring(c.matchScore) +
+          '<div><h3>' + (it.report_type === 'found' ? 'Found' : 'Lost') + ' #' + esc(it.id) + ': ' + esc(it.category) + ', ' + esc(it.color) + '<span class="tier">' + esc(c.confidenceTier) + '</span></h3>' +
+          '<p class="meta">' + esc(it.location) + ' &middot; ' + esc(fmtDate(it.report_date)) + ' &middot; ' + esc(stOf(it)) + '</p>' +
+          '<p class="desc">' + esc(it.description) + '</p>' + meters(c.scoreBreakdown) +
+          '<div class="who">' + esc(it.reporter_name) + ' &middot; <a href="tel:' + esc(it.reporter_contact) + '">' + esc(it.reporter_contact) + '</a></div>' +
+          '<div class="btns"><button class="btn small" data-do="matched">Confirm match</button><button class="btn green small" data-do="claimed">Mark both as claimed</button></div></div></article>';
+      }).join('');
+      $('#dlg-body').dataset.base = id;
+    } catch (err) {
+      dlg.close();
+      if (err.status === 401) return signOut('Your session ended. Sign in again.');
+      toast(err.message, true);
     }
-  </script>
+  }
+
+  $('#dlg-body').addEventListener('click', async e => {
+    const btn = e.target.closest('button[data-do]');
+    if (!btn) return;
+    const base = Number($('#dlg-body').dataset.base);
+    const other = Number(btn.closest('[data-other]').dataset.other);
+    dlg.close();
+    await setStatus([base, other], btn.dataset.do);
+  });
+
+  route();
+})();
+</script>
 </body>
 </html>
