@@ -1,8 +1,8 @@
 import levenshtein from "fast-levenshtein";
 import { createClient } from "@supabase/supabase-js";
 
-// Created inside the handler so config problems return a readable error
-function getSupabase() {
+// ---------- Supabase (created lazily so config problems give a readable error) ----------
+export function getSupabase() {
   const url = process.env.SUPABASE_URL;
   const key = process.env.SUPABASE_SERVICE_KEY;
   if (!url || !key) {
@@ -14,7 +14,7 @@ function getSupabase() {
   return createClient(url, key); // service key stays server-side only
 }
 
-// Synonym normalization map (Section 1.4.2)
+// ---------- Matching engine (Section 1.4.2) ----------
 const SYNONYM_MAP = {
   phone: "cellphone",
   mobile: "cellphone",
@@ -26,30 +26,16 @@ const SYNONYM_MAP = {
 };
 
 const STOP_WORDS = new Set([
-  "a",
-  "an",
-  "the",
-  "in",
-  "on",
-  "at",
-  "with",
-  "near",
-  "found",
-  "lost",
-  "my",
-  "and",
-  "or",
-  "is",
+  "a", "an", "the", "in", "on", "at", "with", "near",
+  "found", "lost", "my", "and", "or", "is",
 ]);
 
-// Preprocessing helper
 function preprocessText(text) {
   if (!text) return [];
-  const tokens = text
+  return text
     .toLowerCase()
     .replace(/[^a-z0-9\s]/g, "")
-    .split(/\s+/);
-  return tokens
+    .split(/\s+/)
     .filter((t) => t && !STOP_WORDS.has(t))
     .map((t) => SYNONYM_MAP[t] || t);
 }
@@ -61,16 +47,13 @@ function calculateStringSimilarity(str1, str2) {
   if (!clean1 && !clean2) return 1.0;
   if (!clean1 || !clean2) return 0.0;
   const distance = levenshtein.get(clean1, clean2);
-  const maxLength = Math.max(clean1.length, clean2.length);
-  return 1 - distance / maxLength;
+  return 1 - distance / Math.max(clean1.length, clean2.length);
 }
 
-// Date proximity calculation (10% weight)
+// Date proximity (10% weight)
 function calculateDateSimilarity(date1, date2) {
   if (!date1 || !date2) return 0.0;
-  const d1 = new Date(date1);
-  const d2 = new Date(date2);
-  const diffDays = Math.abs((d1 - d2) / (1000 * 60 * 60 * 24));
+  const diffDays = Math.abs((new Date(date1) - new Date(date2)) / 86400000);
   if (diffDays <= 1) return 1.0;
   if (diffDays <= 3) return 0.8;
   if (diffDays <= 7) return 0.5;
@@ -78,38 +61,24 @@ function calculateDateSimilarity(date1, date2) {
   return 0.0;
 }
 
-// Weighted Match Evaluator
-function computeMatchScore(lostItem, foundItem) {
-  // 1. Category Match (30%)
+// Weighted match evaluator. Order matters only for readability: (lost, found).
+export function computeMatchScore(lostItem, foundItem) {
   const categoryScore =
-    lostItem.category.toLowerCase() === foundItem.category.toLowerCase()
-      ? 1.0
-      : 0.0;
+    String(lostItem.category).toLowerCase() === String(foundItem.category).toLowerCase() ? 1 : 0;
 
-  // 2. Color Match (20%)
   const color1 = preprocessText(lostItem.color);
   const color2 = preprocessText(foundItem.color);
-  const colorScore = color1.some((c) => color2.includes(c)) ? 1.0 : 0.0;
+  const colorScore = color1.some((c) => color2.includes(c)) ? 1 : 0;
 
-  // 3. Description Similarity via Levenshtein (30%)
-  const descScore = calculateStringSimilarity(
-    lostItem.description,
-    foundItem.description,
-  );
+  const descScore = calculateStringSimilarity(lostItem.description, foundItem.description);
 
-  // 4. Location Proximity (10%)
   const loc1 = preprocessText(lostItem.location).join(" ");
   const loc2 = preprocessText(foundItem.location).join(" ");
   const locationScore =
-    loc1 && loc2 &&
-    (loc1 === loc2 || loc1.includes(loc2) || loc2.includes(loc1))
-      ? 1.0
-      : 0.0;
+    loc1 && loc2 && (loc1 === loc2 || loc1.includes(loc2) || loc2.includes(loc1)) ? 1 : 0;
 
-  // 5. Date Proximity (10%)
   const dateScore = calculateDateSimilarity(lostItem.report_date, foundItem.report_date);
 
-  // Weighted points per criterion (each rounded for display)
   const scoreBreakdown = {
     category: Math.round(categoryScore * 30),
     color: Math.round(colorScore * 20),
@@ -119,14 +88,9 @@ function computeMatchScore(lostItem, foundItem) {
   };
 
   const finalScore = Math.round(
-    categoryScore * 30 +
-      colorScore * 20 +
-      descScore * 30 +
-      locationScore * 10 +
-      dateScore * 10,
+    categoryScore * 30 + colorScore * 20 + descScore * 30 + locationScore * 10 + dateScore * 10,
   );
 
-  // Confidence Tiers (Section 1.4.2)
   let confidenceTier = "Low";
   if (finalScore >= 85) confidenceTier = "High";
   else if (finalScore >= 70) confidenceTier = "Medium";
@@ -134,55 +98,92 @@ function computeMatchScore(lostItem, foundItem) {
   return { finalScore, confidenceTier, scoreBreakdown };
 }
 
-// Vercel Serverless Entry Point
+// ---------- Validation ----------
+export const CATEGORIES = ["Electronics", "Personal Items", "Documents", "Clothing", "Others"];
+
+function clean(report) {
+  const r = {
+    report_type: String(report.report_type || "").trim(),
+    category: String(report.category || "").trim(),
+    color: String(report.color || "").trim(),
+    description: String(report.description || "").trim(),
+    location: String(report.location || "").trim(),
+    report_date: String(report.report_date || "").trim(),
+    reporter_name: String(report.reporter_name || "").trim(),
+    reporter_contact: String(report.reporter_contact || "").trim(),
+  };
+
+  const problems = [];
+  if (!["lost", "found"].includes(r.report_type)) problems.push("report_type must be lost or found");
+  if (!CATEGORIES.includes(r.category)) problems.push("category is not valid");
+  if (!r.color || r.color.length > 50) problems.push("color is required (max 50 characters)");
+  if (!r.description || r.description.length > 2000) problems.push("description is required (max 2000 characters)");
+  if (!r.location || r.location.length > 100) problems.push("location is required (max 100 characters)");
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(r.report_date) || isNaN(new Date(r.report_date)))
+    problems.push("date is not valid");
+  if (!r.reporter_name || r.reporter_name.length > 100) problems.push("name is required (max 100 characters)");
+  if (!/^[0-9+\-\s()]{7,20}$/.test(r.reporter_contact)) problems.push("contact number is not valid");
+
+  return { r, problems };
+}
+
+// ---------- Public endpoint: submit a lost or found report ----------
 export default async function handler(req, res) {
   if (req.method !== "POST") {
     return res.status(405).json({ message: "Method Not Allowed" });
   }
 
-  const { lostReport } = req.body || {};
-  // Your reports table requires these fields (NOT NULL)
-  const required = ["category", "color", "description", "location", "report_date", "reporter_name", "reporter_contact"];
-  const missing = lostReport ? required.filter((k) => !lostReport[k]) : required;
-  if (missing.length) {
-    return res.status(400).json({ message: "Missing fields: " + missing.join(", ") });
+  const { report } = req.body || {};
+  if (!report || typeof report !== "object") {
+    return res.status(400).json({ message: "Invalid payload structure." });
+  }
+
+  const { r, problems } = clean(report);
+  if (problems.length) {
+    return res.status(400).json({ message: "Please fix: " + problems.join("; ") + "." });
   }
 
   try {
     const supabase = getSupabase();
 
-    // 1. Save the new lost report
-    const { error: insertError } = await supabase.from("reports").insert({
-      report_type: "lost",
-      category: lostReport.category,
-      color: lostReport.color,
-      description: lostReport.description,
-      location: lostReport.location,
-      report_date: lostReport.report_date,
-      reporter_name: lostReport.reporter_name,
-      reporter_contact: lostReport.reporter_contact,
-    });
+    // 1. Save the report
+    const { data: saved, error: insertError } = await supabase
+      .from("reports")
+      .insert(r)
+      .select("id")
+      .single();
     if (insertError) throw insertError;
 
-    // 2. Fetch found reports from the database (the server does this, not the browser)
+    // Found reports are only saved. Staff review possible owners privately.
+    if (r.report_type === "found") {
+      return res.status(200).json({ success: true, reportId: saved.id, reportType: "found" });
+    }
+
+    // 2. Lost reports are compared against unclaimed found items
     const { data: foundReports, error } = await supabase
       .from("reports")
       .select("*")
-      .eq("report_type", "found");
+      .eq("report_type", "found")
+      .or("status.is.null,status.neq.claimed");
     if (error) throw error;
 
-    // 3. Score, strip private data, filter, sort
+    // 3. Score, strip private data (RA 10173), filter, sort
     const matches = foundReports
       .map((foundItem) => {
-        const { finalScore, confidenceTier, scoreBreakdown } = computeMatchScore(lostReport, foundItem);
-        // RA 10173: never send contact details to the client
+        const { finalScore, confidenceTier, scoreBreakdown } = computeMatchScore(r, foundItem);
         const { reporter_name, reporter_contact, ...safeFoundItem } = foundItem;
         return { foundItem: safeFoundItem, matchScore: finalScore, confidenceTier, scoreBreakdown };
       })
       .filter((m) => m.matchScore >= 70)
       .sort((a, b) => b.matchScore - a.matchScore);
 
-    return res.status(200).json({ success: true, totalMatches: matches.length, matches });
+    return res.status(200).json({
+      success: true,
+      reportId: saved.id,
+      reportType: "lost",
+      totalMatches: matches.length,
+      matches,
+    });
   } catch (err) {
     console.error("match error:", err);
     return res.status(500).json({ message: err.message || "Server error" });
