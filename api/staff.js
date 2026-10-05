@@ -26,7 +26,26 @@ export default async function handler(req, res) {
       if (!email || !password) throw new HttpError(400, "Enter your email and password.");
 
       const { data, error } = await getAuthClient().auth.signInWithPassword({ email, password });
-      if (error || !data || !data.session) throw new HttpError(401, "Incorrect email or password.");
+      if (error || !data || !data.session) {
+        const code = (error && error.code) || "";
+        const msg = String((error && error.message) || "");
+        if (code === "email_not_confirmed" || /not confirmed/i.test(msg)) {
+          throw new HttpError(
+            401,
+            "This account exists but its email is not confirmed. In Supabase, delete the user and create it again with Auto Confirm User ticked.",
+          );
+        }
+        if (code === "invalid_credentials" || /invalid login credentials/i.test(msg)) {
+          throw new HttpError(401, "Incorrect email or password.");
+        }
+        // Anything else is a setup problem (wrong key, provider off, rate limit). Show it so it can be fixed.
+        console.error("login error:", error);
+        throw new HttpError(
+          500,
+          "Sign-in is not set up correctly: " + (msg || "unknown error") +
+            ". Check SUPABASE_URL and SUPABASE_ANON_KEY in Vercel.",
+        );
+      }
       if (!isAllowedStaff(data.user.email)) {
         throw new HttpError(403, "This account is not allowed to use the staff area.");
       }
