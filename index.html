@@ -200,6 +200,10 @@ dialog::backdrop{background:rgba(8,20,25,.6)}
 
 .toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:11px 18px;border-radius:12px;font-weight:600;z-index:50;box-shadow:0 8px 24px rgba(0,0,0,.25)}
 .toast.err{background:var(--danger);color:#fff}
+.testbanner{background:var(--soft-warn);color:var(--warn);border-radius:12px;padding:12px 16px;margin-bottom:20px;font-size:.92rem}
+.badge.test{background:var(--soft-warn);color:var(--warn);margin-left:6px}
+.who-am-i{color:var(--muted);font-size:.9rem}
+.btn.ghost.danger{color:var(--danger)}.btn.ghost.danger:hover{background:var(--soft-danger)}
 footer{text-align:center;color:var(--muted);font-size:.82rem;padding:0 20px 36px}
 
 @media (max-width:560px){
@@ -233,15 +237,17 @@ footer{text-align:center;color:var(--muted);font-size:.82rem;padding:0 20px 36px
 
 <!-- ======================= PUBLIC: REPORT ======================= -->
 <main id="view-report">
+  <div class="testbanner" id="test-banner" role="note" hidden><b>Test mode.</b> Reports you submit here are marked as test data and kept apart from real reports.</div>
+
   <section class="hero" id="hero">
     <h1>Lost it? Found it? Tell us.</h1>
-    <p>Report an item and we compare it against everything the barangay has on file. Matches appear right away.</p>
+    <p>Report an item and barangay staff will compare it against everything on file, then contact you.</p>
   </section>
 
   <div class="pair" id="pair" role="radiogroup" aria-label="What happened?">
     <button type="button" class="tile tile-lost" role="radio" aria-checked="true" data-type="lost">
       <span class="tile-title">I lost something</span>
-      <span class="tile-sub">We'll look for a match</span>
+      <span class="tile-sub">Staff will look for a match</span>
     </button>
     <button type="button" class="tile tile-found" role="radio" aria-checked="false" data-type="found">
       <span class="tile-title">I found something</span>
@@ -313,12 +319,16 @@ footer{text-align:center;color:var(--muted);font-size:.82rem;padding:0 20px 36px
 <main id="view-staff" class="wide" hidden>
   <section id="staff-login" class="card login">
     <h2>Staff sign in</h2>
-    <p class="muted" style="margin:-8px 0 18px">Enter the staff passcode to see reports and contact details.</p>
+    <p class="muted" style="margin:-8px 0 18px">Use your staff account to see reports and contact details.</p>
     <div id="login-error" class="form-error" role="alert" hidden></div>
     <form id="login-form">
       <div class="field">
-        <label for="passcode">Passcode</label>
-        <input class="input" id="passcode" type="password" autocomplete="current-password" required>
+        <label for="login-email">Email</label>
+        <input class="input" id="login-email" type="email" autocomplete="username" required>
+      </div>
+      <div class="field">
+        <label for="login-password">Password</label>
+        <input class="input" id="login-password" type="password" autocomplete="current-password" required>
       </div>
       <button class="btn block" type="submit" id="login-btn">Sign in</button>
     </form>
@@ -327,6 +337,7 @@ footer{text-align:center;color:var(--muted);font-size:.82rem;padding:0 20px 36px
   <section id="staff-app" hidden>
     <div class="page-head">
       <h1>Reports</h1>
+      <span class="who-am-i" id="staff-email"></span>
       <button class="btn ghost small" id="refresh-btn" type="button">Refresh</button>
       <button class="btn ghost small" id="signout-btn" type="button">Sign out</button>
     </div>
@@ -345,7 +356,13 @@ footer{text-align:center;color:var(--muted);font-size:.82rem;padding:0 20px 36px
         <option value="matched">Matched</option>
         <option value="claimed">Claimed</option>
       </select>
+      <select class="input" id="data-filter" aria-label="Filter by real or test data">
+        <option value="all">All data</option>
+        <option value="real">Real data</option>
+        <option value="test">Test data</option>
+      </select>
       <input class="input search" id="search" type="search" placeholder="Search reports" aria-label="Search reports">
+      <button class="btn ghost small danger" id="purge-btn" type="button" hidden>Delete test data</button>
     </div>
 
     <div class="table-wrap">
@@ -431,8 +448,25 @@ footer{text-align:center;color:var(--muted);font-size:.82rem;padding:0 20px 36px
   const ring = s => '<div class="ring" style="--p:' + s + '" role="img" aria-label="' + s + ' percent match"><b>' + s + '%</b></div>';
 
   /* ---------- routing ---------- */
+  let testMode = false; // #/test marks everything submitted as test data
+  let lastMode = null;
+  function showForm() {
+    resetForm();
+    $('#result').hidden = true;
+    $('#report-form').hidden = false;
+    $('#hero').hidden = false;
+    $('#pair').hidden = false;
+  }
   function route() {
     const staff = location.hash.startsWith('#/staff');
+    if (!staff) {
+      const m = location.hash.startsWith('#/test');
+      if (lastMode !== null && m !== lastMode) showForm(); // switching between real and test starts a fresh form
+      lastMode = m;
+      testMode = m;
+    }
+    $('#test-banner').hidden = !testMode || staff;
+    $('#nav-report').setAttribute('href', testMode ? '#/test' : '#/');
     $('#view-report').hidden = staff;
     $('#view-staff').hidden = !staff;
     $('#nav-report').toggleAttribute('aria-current', !staff);
@@ -453,7 +487,7 @@ footer{text-align:center;color:var(--muted);font-size:.82rem;padding:0 20px 36px
     lost: {
       title: 'Tell us what you lost', where: 'Where did you lose it?', when: 'When did you lose it?',
       hint: 'Brand, size, marks and what was inside help us find the right match.',
-      submit: 'Submit lost report', busy: 'Searching for matches...'
+      submit: 'Submit lost report', busy: 'Saving report...'
     },
     found: {
       title: 'Tell us what you found', where: 'Where did you find it?', when: 'When did you find it?',
@@ -506,7 +540,8 @@ footer{text-align:center;color:var(--muted);font-size:.82rem;padding:0 20px 36px
       location: $('#location').value.trim(),
       report_date: $('#report_date').value,
       reporter_name: $('#reporter_name').value.trim(),
-      reporter_contact: $('#reporter_contact').value.trim()
+      reporter_contact: $('#reporter_contact').value.trim(),
+      is_test: testMode
     };
   }
 
@@ -555,34 +590,18 @@ footer{text-align:center;color:var(--muted);font-size:.82rem;padding:0 20px 36px
 
   function showResult(data) {
     const res = $('#result');
+    const lost = data.reportType === 'lost';
     const ref = '<span class="refno">#' + esc(data.reportId) + '</span>';
     const check = '<div class="done-icon"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></div>';
-    let html = '';
+    const next = lost
+      ? '<h3>What happens next</h3><p>Barangay staff compare your report with the items on file and contact you at the number you gave. You can also visit the barangay hall and give your report number to check in person.</p>'
+      : '<h3>What to do with the item</h3><p>Bring it to the barangay hall and give staff your report number. They will hold it safely and verify the owner before releasing it.</p>';
+    const testNote = data.isTest ? '<p class="muted" style="margin-top:14px">This was a test entry. It is kept apart from real reports.</p>' : '';
 
-    if (data.reportType === 'found') {
-      html = '<div class="card"><div class="done">' + check +
-        '<div><h2>Found report submitted</h2><p>Thank you. Your report number is ' + ref + '. Keep it handy.</p></div></div>' +
-        '<div class="next"><h3>What to do with the item</h3><p>Bring it to the barangay hall and give staff your report number. They will hold it safely and verify the owner before releasing it.</p></div>' +
-        '<div class="actions-row"><button class="btn" data-again>Report another item</button></div></div>';
-    } else if (data.totalMatches > 0) {
-      html = '<div class="done">' + check +
-        '<div><h2>' + data.totalMatches + (data.totalMatches === 1 ? ' possible match' : ' possible matches') + '</h2><p>Lost report submitted. Your report number is ' + ref + '</p></div></div>' +
-        '<div class="matches">' + data.matches.map(m => {
-          const f = m.foundItem;
-          return '<article class="match ' + tierClass(m.confidenceTier) + '">' + ring(m.matchScore) +
-            '<div><h3>' + esc(f.category) + ', ' + esc(f.color) + '<span class="tier">' + esc(m.confidenceTier) + '</span></h3>' +
-            '<p class="meta">Found item #' + esc(f.id) + ' &middot; ' + esc(f.location) + ' &middot; ' + esc(fmtDate(f.report_date)) + '</p>' +
-            '<p class="desc">' + esc(f.description) + '</p>' + meters(m.scoreBreakdown) + '</div></article>';
-        }).join('') + '</div>' +
-        '<div class="next"><h3>How to claim</h3><p>Go to the barangay hall with a valid ID and your report number ' + ref + '. Staff will ask you about details only the owner would know before releasing the item.</p></div>' +
-        '<div class="actions-row"><button class="btn ghost" data-again>Report another item</button></div>';
-    } else {
-      html = '<div class="card"><div class="done">' + check +
-        '<div><h2>Report submitted, no match yet</h2><p>Your report number is ' + ref + '. Nothing on file looks like your item right now.</p></div></div>' +
-        '<div class="next"><h3>What happens next</h3><p>Staff keep your report on file and compare it with every new found item. You can also visit the barangay hall and give your report number to check in person.</p></div>' +
-        '<div class="actions-row"><button class="btn" data-again>Report another item</button></div></div>';
-    }
-    res.innerHTML = html;
+    res.innerHTML = '<div class="card"><div class="done">' + check +
+      '<div><h2>' + (lost ? 'Lost report submitted' : 'Found report submitted') + '</h2><p>Your report number is ' + ref + '. Keep it handy.</p></div></div>' +
+      '<div class="next">' + next + '</div>' + testNote +
+      '<div class="actions-row"><button class="btn" data-again>Report another item</button></div></div>';
     res.hidden = false;
     $('#report-form').hidden = true;
     $('#hero').hidden = true; $('#pair').hidden = true;
@@ -595,50 +614,76 @@ footer{text-align:center;color:var(--muted);font-size:.82rem;padding:0 20px 36px
   /* =====================================================
      STAFF
      ===================================================== */
-  let staffPass = null;
-  try { staffPass = sessionStorage.getItem('tugma_staff'); } catch (e) { /* storage blocked */ }
+  let session = null; // { access_token, refresh_token, email }
+  try { session = JSON.parse(sessionStorage.getItem('tugma_staff') || 'null'); } catch (e) { /* storage blocked */ }
   let reports = [];
-  const filter = { type: 'all', status: 'all', q: '' };
+  const filter = { type: 'all', status: 'all', data: 'all', q: '' };
 
-  const staffApi = (action, payload = {}) => api('/api/staff', Object.assign({ action }, payload), { 'x-staff-passcode': staffPass || '' });
+  function saveSession(s) {
+    session = s;
+    try {
+      if (s) sessionStorage.setItem('tugma_staff', JSON.stringify(s));
+      else sessionStorage.removeItem('tugma_staff');
+    } catch (e) { /* ignore */ }
+  }
+
+  async function staffApi(action, payload = {}, retry = true) {
+    try {
+      return await api('/api/staff', Object.assign({ action }, payload), { Authorization: 'Bearer ' + (session ? session.access_token : '') });
+    } catch (err) {
+      // An expired access token is refreshed once, silently, then the call is retried.
+      if (err.status === 401 && retry && session && session.refresh_token) {
+        let r;
+        try { r = await api('/api/staff', { action: 'refresh', refresh_token: session.refresh_token }); }
+        catch (e) { throw err; }
+        saveSession(Object.assign({}, session, { access_token: r.access_token, refresh_token: r.refresh_token }));
+        return staffApi(action, payload, false);
+      }
+      throw err;
+    }
+  }
+
+  function showStaffApp() {
+    $('#staff-login').hidden = true;
+    $('#staff-app').hidden = false;
+    $('#staff-email').textContent = session ? 'Signed in as ' + session.email : '';
+  }
 
   function signOut(msg) {
-    staffPass = null;
-    try { sessionStorage.removeItem('tugma_staff'); } catch (e) { /* ignore */ }
+    saveSession(null);
     reports = [];
     $('#staff-app').hidden = true;
     $('#staff-login').hidden = false;
-    $('#passcode').value = '';
+    $('#staff-email').textContent = '';
+    $('#login-password').value = '';
     const box = $('#login-error');
     box.hidden = !msg;
     box.textContent = msg || '';
   }
 
   function initStaff() {
-    if (staffPass) {
-      $('#staff-login').hidden = true;
-      $('#staff-app').hidden = false;
+    if (session) {
+      showStaffApp();
       loadReports();
     } else {
       signOut();
-      setTimeout(() => $('#passcode').focus(), 0);
+      setTimeout(() => $('#login-email').focus(), 0);
     }
   }
 
   $('#login-form').addEventListener('submit', async e => {
     e.preventDefault();
     const btn = $('#login-btn');
-    staffPass = $('#passcode').value;
-    btn.disabled = true; btn.textContent = 'Checking...';
+    btn.disabled = true; btn.textContent = 'Signing in...';
     try {
-      await staffApi('login');
-      try { sessionStorage.setItem('tugma_staff', staffPass); } catch (err) { /* ignore */ }
+      const r = await api('/api/staff', { action: 'login', email: $('#login-email').value.trim(), password: $('#login-password').value });
+      saveSession({ access_token: r.access_token, refresh_token: r.refresh_token, email: r.email });
       $('#login-error').hidden = true;
-      $('#staff-login').hidden = true;
-      $('#staff-app').hidden = false;
+      $('#login-password').value = '';
+      showStaffApp();
       loadReports();
     } catch (err) {
-      signOut(err.status === 401 ? 'That passcode is not correct. Try again.' : err.message);
+      signOut(err.message);
     } finally {
       btn.disabled = false; btn.textContent = 'Sign in';
     }
@@ -655,18 +700,20 @@ footer{text-align:center;color:var(--muted);font-size:.82rem;padding:0 20px 36px
       if (showToast) toast('Reports refreshed');
     } catch (err) {
       if (err.status === 401) return signOut('Your session ended. Sign in again.');
+      if (err.status === 403) return signOut(err.message);
       toast(err.message, true);
     }
   }
 
   const stOf = r => r.status || 'unmatched';
+  const scope = () => reports.filter(r => filter.data === 'all' || (filter.data === 'test') === !!r.is_test);
 
   function renderStats() {
     const c = {
-      lost: reports.filter(r => r.report_type === 'lost' && stOf(r) !== 'claimed').length,
-      found: reports.filter(r => r.report_type === 'found' && stOf(r) !== 'claimed').length,
-      matched: reports.filter(r => stOf(r) === 'matched').length,
-      claimed: reports.filter(r => stOf(r) === 'claimed').length
+      lost: scope().filter(r => r.report_type === 'lost' && stOf(r) !== 'claimed').length,
+      found: scope().filter(r => r.report_type === 'found' && stOf(r) !== 'claimed').length,
+      matched: scope().filter(r => stOf(r) === 'matched').length,
+      claimed: scope().filter(r => stOf(r) === 'claimed').length
     };
     $('#stats').innerHTML =
       '<div class="stat lost"><b>' + c.lost + '</b><span>Lost, still open</span></div>' +
@@ -678,7 +725,7 @@ footer{text-align:center;color:var(--muted);font-size:.82rem;padding:0 20px 36px
   function rowHtml(r) {
     const st = stOf(r);
     return '<tr data-id="' + esc(r.id) + '">' +
-      '<td data-label="No."><span class="num">#' + esc(r.id) + '</span></td>' +
+      '<td data-label="No."><span class="num">#' + esc(r.id) + '</span>' + (r.is_test ? '<span class="badge test">Test</span>' : '') + '</td>' +
       '<td data-label="Type"><span class="badge ' + esc(r.report_type) + '">' + (r.report_type === 'lost' ? 'Lost' : 'Found') + '</span></td>' +
       '<td data-label="Item" class="item"><div><b>' + esc(r.category) + '</b>, ' + esc(r.color) + '<p>' + esc(r.description) + '</p></div></td>' +
       '<td data-label="Where and when"><div>' + esc(r.location) + '<br><span class="muted">' + esc(fmtDate(r.report_date)) + '</span></div></td>' +
@@ -692,8 +739,11 @@ footer{text-align:center;color:var(--muted);font-size:.82rem;padding:0 20px 36px
 
   function renderStaff() {
     renderStats();
+    const nTest = reports.filter(r => r.is_test).length;
+    $('#purge-btn').hidden = nTest === 0;
+    $('#purge-btn').textContent = 'Delete test data (' + nTest + ')';
     const q = filter.q.trim().toLowerCase();
-    const list = reports.filter(r =>
+    const list = scope().filter(r =>
       (filter.type === 'all' || r.report_type === filter.type) &&
       (filter.status === 'all' || stOf(r) === filter.status) &&
       (!q || [r.id, r.category, r.color, r.description, r.location, r.reporter_name, r.reporter_contact].join(' ').toLowerCase().includes(q))
@@ -714,6 +764,20 @@ footer{text-align:center;color:var(--muted);font-size:.82rem;padding:0 20px 36px
     renderStaff();
   }));
   $('#status-filter').addEventListener('change', e => { filter.status = e.target.value; renderStaff(); });
+  $('#data-filter').addEventListener('change', e => { filter.data = e.target.value; renderStaff(); });
+  $('#purge-btn').addEventListener('click', async () => {
+    const n = reports.filter(r => r.is_test).length;
+    if (!n || !confirm('Delete all ' + n + ' test reports? Real reports are not affected.')) return;
+    try {
+      const r = await staffApi('purge_test');
+      reports = reports.filter(x => !x.is_test);
+      renderStaff();
+      toast(r.deleted + ' test reports deleted');
+    } catch (err) {
+      if (err.status === 401) return signOut('Your session ended. Sign in again.');
+      toast(err.message, true);
+    }
+  });
   $('#search').addEventListener('input', e => { filter.q = e.target.value; renderStaff(); });
 
   async function setStatus(ids, status) {
