@@ -832,7 +832,7 @@ footer{text-align:center;color:var(--muted);font-size:.82rem;padding:0 20px 36px
       const b = data.report;
       $('#dlg-sub').textContent = (b.report_type === 'lost' ? 'Lost: ' : 'Found: ') + b.category + ', ' + b.color + '. Showing candidates scoring 50% or higher.';
       if (!data.candidates.length) {
-        $('#dlg-body').innerHTML = '<div class="empty"><b>No candidates yet</b>Nothing on file scores 50% or higher against this report.</div>';
+        $('#dlg-body').innerHTML = '<div class="empty"><b>No possible matches yet.</b>Nothing on the list shows possible matches yet.</div>';
         return;
       }
       $('#dlg-body').innerHTML = data.candidates.map(c => {
