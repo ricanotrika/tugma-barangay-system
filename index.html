@@ -149,9 +149,29 @@ textarea.input{min-height:104px;resize:vertical}
 .page-head h1{font-size:1.9rem;font-weight:800;margin-right:auto}
 .stats{display:grid;gap:12px;grid-template-columns:repeat(2,1fr);margin-bottom:20px}
 @media (min-width:760px){.stats{grid-template-columns:repeat(4,1fr)}}
-.stat{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:14px 16px}
+.stat{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:14px 16px;text-align:left;width:100%;font:inherit;color:inherit;display:block}
+button.stat{cursor:pointer;transition:transform .12s,box-shadow .12s,background .12s}
+button.stat:hover{transform:translateY(-2px);box-shadow:0 6px 16px rgba(0,0,0,.12)}
+button.stat:focus-visible{outline:3px solid var(--brand);outline-offset:2px}
+button.stat[aria-pressed="true"]{background:var(--soft-brand);border-color:var(--brand)}
 .stat b{display:block;font:800 1.9rem/1.1 var(--font-head)}
 .stat span{color:var(--muted);font-size:.88rem}
+.table[hidden],.skeleton-list[hidden]{display:none!important}
+.stat small{display:block;color:var(--muted);font-size:.75rem;margin-top:4px;opacity:.85}
+/* skeleton loading */
+.sk{display:block;border-radius:8px;background:linear-gradient(90deg,var(--line) 25%,var(--line-strong) 37%,var(--line) 63%);background-size:400% 100%;animation:sk-shimmer 1.3s ease infinite}
+@keyframes sk-shimmer{0%{background-position:100% 50%}100%{background-position:0 50%}}
+.stat .sk.n{width:44px;height:30px;margin-bottom:10px}
+.stat .sk.l{width:70%;height:12px}
+.skeleton-list{padding:6px 14px}
+.sk-row{display:grid;grid-template-columns:60px 70px 2fr 1.2fr 1.2fr 100px;gap:16px;align-items:center;padding:16px 0;border-bottom:1px solid var(--line)}
+.sk-row:last-child{border-bottom:0}
+.sk-row .sk{height:14px}
+@media (max-width:860px){.sk-row{grid-template-columns:1fr 1fr}}
+@media (prefers-reduced-motion:reduce){.sk{animation:none}button.stat{transition:none}}
+#refresh-btn[aria-busy="true"]{opacity:.7;cursor:progress}
+#refresh-btn .spin{display:inline-block;width:12px;height:12px;border:2px solid currentColor;border-right-color:transparent;border-radius:50%;margin-right:6px;vertical-align:-1px;animation:spin .7s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
 .stat.lost{border-top:4px solid var(--brand)}.stat.found{border-top:4px solid var(--green)}
 .stat.matched{border-top:4px solid #d49a2e}.stat.claimed{border-top:4px solid var(--line-strong)}
 .toolbar{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:14px;align-items:center}
@@ -299,7 +319,8 @@ footer{text-align:center;color:var(--muted);font-size:.82rem;padding:0 20px 36px
       </div>
       <div class="field" id="f-reporter_contact">
         <label for="reporter_contact">Your mobile number</label>
-        <input class="input" id="reporter_contact" maxlength="20" inputmode="tel" autocomplete="tel" placeholder="09XX XXX XXXX">
+        <input class="input" id="reporter_contact" inputmode="numeric" pattern="[0-9]*" autocomplete="tel" placeholder="09123456789">
+        <p class="hint">11 digits, starting with 09</p>
         <p class="error" hidden></p>
       </div>
     </div>
@@ -352,6 +373,7 @@ footer{text-align:center;color:var(--muted);font-size:.82rem;padding:0 20px 36px
       </div>
       <select class="input" id="status-filter" aria-label="Filter by status">
         <option value="all">Any status</option>
+        <option value="open">Still open</option>
         <option value="unmatched">Unmatched</option>
         <option value="matched">Matched</option>
         <option value="claimed">Claimed</option>
@@ -370,6 +392,7 @@ footer{text-align:center;color:var(--muted);font-size:.82rem;padding:0 20px 36px
         <thead><tr><th>No.</th><th>Type</th><th>Item</th><th>Where and when</th><th>Reporter</th><th>Status</th><th></th></tr></thead>
         <tbody id="rows"></tbody>
       </table>
+      <div class="skeleton-list" id="skeleton" hidden aria-hidden="true"></div>
       <div class="empty" id="empty" hidden></div>
     </div>
   </section>
@@ -398,7 +421,7 @@ footer{text-align:center;color:var(--muted);font-size:.82rem;padding:0 20px 36px
 
   async function api(path, body, headers = {}) {
     if (location.protocol === 'file:') {
-      throw new Error('This page was opened as a local file. Open your Vercel link instead, or run "npx vercel dev".');
+      throw new Error('This page was opened as a local file. Run "npm run dev" and open http://localhost:3000, or use your Vercel link.');
     }
     let res;
     try {
@@ -410,6 +433,11 @@ footer{text-align:center;color:var(--muted);font-size:.82rem;padding:0 20px 36px
     let data = null;
     try { data = JSON.parse(text); } catch (e) { /* not JSON */ }
     if (!res.ok) {
+      if (!data && [404, 405, 501].includes(res.status) && location.hostname === 'localhost') {
+        const e2 = new Error('The /api server is not running on this address. Run "npm run dev" and open http://localhost:3000 instead.');
+        e2.status = res.status;
+        throw e2;
+      }
       const err = new Error((data && data.message) || ('Server error (' + res.status + ').'));
       err.status = res.status;
       throw err;
@@ -554,10 +582,17 @@ footer{text-align:center;color:var(--muted);font-size:.82rem;padding:0 20px 36px
     if (!r.description) errs.description = 'Describe the item so we can match it.';
     if (!r.location) errs.location = 'Enter the place.';
     if (!r.reporter_name) errs.reporter_name = 'Enter your full name.';
-    if (!/^[0-9+\-\s()]{7,20}$/.test(r.reporter_contact)) errs.reporter_contact = 'Enter a valid mobile number, like 0912 345 6789.';
+    if (!/^09\d{9}$/.test(r.reporter_contact)) errs.reporter_contact = 'Enter an 11-digit mobile number starting with 09, like 09123456789.';
     ['category', 'color', 'report_date', 'description', 'location', 'reporter_name', 'reporter_contact'].forEach(k => setErr(k, errs[k]));
     return errs;
   }
+
+  // Mobile number: digits only, at most 11. "+63 912..." and "63912..." are turned into "0912...".
+  $('#reporter_contact').addEventListener('input', e => {
+    let d = e.target.value.replace(/\D/g, '');
+    if (d.startsWith('63') && d.length > 11) d = '0' + d.slice(2);
+    e.target.value = d.slice(0, 11);
+  });
 
   $('#report-form').addEventListener('submit', async e => {
     e.preventDefault();
@@ -692,13 +727,40 @@ footer{text-align:center;color:var(--muted);font-size:.82rem;padding:0 20px 36px
   $('#signout-btn').addEventListener('click', () => signOut());
   $('#refresh-btn').addEventListener('click', () => loadReports(true));
 
+  let loading = false;
+  function setLoading(on) {
+    loading = on;
+    const btn = $('#refresh-btn');
+    btn.disabled = on;
+    btn.setAttribute('aria-busy', String(on));
+    btn.innerHTML = on ? '<span class="spin" aria-hidden="true"></span>Refreshing' : 'Refresh';
+    $('#stats').setAttribute('aria-busy', String(on));
+    if (on) {
+      $('#stats').innerHTML = [0, 1, 2, 3].map(() => '<div class="stat"><span class="sk n"></span><span class="sk l"></span></div>').join('');
+      $('#skeleton').innerHTML = [0, 1, 2, 3, 4].map(() =>
+        '<div class="sk-row"><span class="sk"></span><span class="sk"></span><span class="sk"></span><span class="sk"></span><span class="sk"></span><span class="sk"></span></div>').join('');
+    }
+    $('#skeleton').hidden = !on;
+    $('.table').hidden = on;
+    if (on) $('#empty').hidden = true;
+  }
+
   async function loadReports(showToast) {
+    if (loading) return;
+    setLoading(true);
+    const started = Date.now();
     try {
       const data = await staffApi('list');
       reports = data.reports || [];
+      // Keep the skeleton on screen long enough to be seen, even on a fast connection.
+      const wait = 450 - (Date.now() - started);
+      if (wait > 0) await new Promise(r => setTimeout(r, wait));
+      setLoading(false);
       renderStaff();
       if (showToast) toast('Reports refreshed');
     } catch (err) {
+      setLoading(false);
+      renderStaff();
       if (err.status === 401) return signOut('Your session ended. Sign in again.');
       if (err.status === 403) return signOut(err.message);
       toast(err.message, true);
@@ -715,11 +777,34 @@ footer{text-align:center;color:var(--muted);font-size:.82rem;padding:0 20px 36px
       matched: scope().filter(r => stOf(r) === 'matched').length,
       claimed: scope().filter(r => stOf(r) === 'claimed').length
     };
-    $('#stats').innerHTML =
-      '<div class="stat lost"><b>' + c.lost + '</b><span>Lost, still open</span></div>' +
-      '<div class="stat found"><b>' + c.found + '</b><span>Found, still open</span></div>' +
-      '<div class="stat matched"><b>' + c.matched + '</b><span>Matched</span></div>' +
-      '<div class="stat claimed"><b>' + c.claimed + '</b><span>Claimed</span></div>';
+    const cards = [
+      ['lost', 'lost', 'open', c.lost, 'Lost, still open'],
+      ['found', 'found', 'open', c.found, 'Found, still open'],
+      ['matched', 'all', 'matched', c.matched, 'Matched'],
+      ['claimed', 'all', 'claimed', c.claimed, 'Claimed']
+    ];
+    $('#stats').innerHTML = cards.map(([cls, type, status, n, label]) => {
+      const on = filter.type === type && filter.status === status;
+      return '<button type="button" class="stat ' + cls + '" data-type="' + type + '" data-status="' + status + '" aria-pressed="' + on + '">' +
+        '<b>' + n + '</b><span>' + label + '</span></button>';
+    }).join('');
+  }
+
+  // Clicking a card filters the table; clicking the active card clears the filter.
+  $('#stats').addEventListener('click', e => {
+    const card = e.target.closest('button.stat');
+    if (!card) return;
+    const on = card.getAttribute('aria-pressed') === 'true';
+    filter.type = on ? 'all' : card.dataset.type;
+    filter.status = on ? 'all' : card.dataset.status;
+    syncControls();
+    renderStaff();
+    if (!on) $('.table-wrap').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  });
+
+  function syncControls() {
+    $$('#seg-type button').forEach(x => x.setAttribute('aria-pressed', String(x.dataset.v === filter.type)));
+    $('#status-filter').value = filter.status;
   }
 
   function rowHtml(r) {
@@ -745,7 +830,7 @@ footer{text-align:center;color:var(--muted);font-size:.82rem;padding:0 20px 36px
     const q = filter.q.trim().toLowerCase();
     const list = scope().filter(r =>
       (filter.type === 'all' || r.report_type === filter.type) &&
-      (filter.status === 'all' || stOf(r) === filter.status) &&
+      (filter.status === 'all' || (filter.status === 'open' ? stOf(r) !== 'claimed' : stOf(r) === filter.status)) &&
       (!q || [r.id, r.category, r.color, r.description, r.location, r.reporter_name, r.reporter_contact].join(' ').toLowerCase().includes(q))
     );
     $('#rows').innerHTML = list.map(rowHtml).join('');
@@ -760,7 +845,7 @@ footer{text-align:center;color:var(--muted);font-size:.82rem;padding:0 20px 36px
 
   $$('#seg-type button').forEach(b => b.addEventListener('click', () => {
     filter.type = b.dataset.v;
-    $$('#seg-type button').forEach(x => x.setAttribute('aria-pressed', String(x === b)));
+    syncControls();
     renderStaff();
   }));
   $('#status-filter').addEventListener('change', e => { filter.status = e.target.value; renderStaff(); });
@@ -832,7 +917,7 @@ footer{text-align:center;color:var(--muted);font-size:.82rem;padding:0 20px 36px
       const b = data.report;
       $('#dlg-sub').textContent = (b.report_type === 'lost' ? 'Lost: ' : 'Found: ') + b.category + ', ' + b.color + '. Showing candidates scoring 50% or higher.';
       if (!data.candidates.length) {
-        $('#dlg-body').innerHTML = '<div class="empty"><b>No possible matches yet.</b>Nothing on the list shows possible matches yet.</div>';
+        $('#dlg-body').innerHTML = '<div class="empty"><b>No candidates yet</b>Nothing on file scores 50% or higher against this report.</div>';
         return;
       }
       $('#dlg-body').innerHTML = data.candidates.map(c => {
