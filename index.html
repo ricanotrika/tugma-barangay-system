@@ -13,8 +13,8 @@
 :root{
   --brand:#12475c; --brand-deep:#0c3445; --green:#1e9470; --green-deep:#157556;
   --accent-text:#12475c; --green-text:#157556;
-  --bg:#eef3f2; --surface:#ffffff; --ink:#13242b; --muted:#566b73;
-  --line:#d6e0e1; --line-strong:#b4c6c8;
+  --bg:#ffffff; --surface:#ffffff; --panel:#f2f6f7; --ink:#13242b; --muted:#465a62;
+  --line:#cbd7d9; --line-strong:#97adb2;
   --soft-brand:#e1edf1; --soft-green:#dff1ea;
   --warn:#8f5605; --soft-warn:#fbefd9; --danger:#b3302b; --soft-danger:#fbe5e3;
   --font-head:"Bricolage Grotesque","Segoe UI",system-ui,sans-serif;
@@ -22,16 +22,16 @@
 }
 @media (prefers-color-scheme:dark){
   :root{
-    --brand:#1d6483; --brand-deep:#174f68; --green:#23a37c; --green-deep:#1b8765;
-    --accent-text:#8fd0e8; --green-text:#6fd2b0;
-    --bg:#0d181c; --surface:#14242a; --ink:#e8f1f2; --muted:#9fb4ba;
-    --line:#25393f; --line-strong:#38535c;
-    --soft-brand:#173b49; --soft-green:#143a2e;
-    --warn:#f0b865; --soft-warn:#3a2c12; --danger:#ff8f88; --soft-danger:#3d1d1b;
+    --brand:#1f6785; --brand-deep:#2a7a9b; --green:#1e9470; --green-deep:#25a67f;
+    --accent-text:#8fd0e8; --green-text:#6dd5a8;
+    --bg:#0b171d; --surface:#122229; --panel:#1a2e38; --ink:#e6f0f3; --muted:#a3b9c1;
+    --line:#28404a; --line-strong:#43606c;
+    --soft-brand:#14384a; --soft-green:#163d2f;
+    --warn:#f0b95a; --soft-warn:#3a2d12; --danger:#ff8f86; --soft-danger:#3d1c1a;
   }
 }
 *{box-sizing:border-box}
-html{-webkit-text-size-adjust:100%}
+html{-webkit-text-size-adjust:100%;font-size:112.5%}
 body{margin:0;background:var(--bg);color:var(--ink);font:400 1rem/1.55 var(--font-body)}
 h1,h2,h3{font-family:var(--font-head);line-height:1.15;margin:0;letter-spacing:-.02em}
 p{margin:0}
@@ -60,7 +60,7 @@ main.wide{max-width:1180px}
 .hero h1{font-size:clamp(2rem,6vw,3rem);font-weight:800;max-width:15ch}
 .hero p{color:var(--muted);margin:12px 0 28px;max-width:52ch;font-size:1.05rem}
 
-.pair{display:grid;grid-template-columns:1fr 1fr;margin-bottom:28px}
+.tile-group{display:grid;grid-template-columns:1fr 1fr;margin-bottom:28px}
 .tile{position:relative;text-align:left;border:0;cursor:pointer;min-height:116px;padding:22px 26px;
   display:flex;flex-direction:column;justify-content:center;gap:4px;transition:background .2s,color .2s}
 .tile-title{font:700 1.2rem/1.2 var(--font-head);letter-spacing:-.01em}
@@ -70,6 +70,7 @@ main.wide{max-width:1180px}
 .tile-lost::after{content:"";position:absolute;right:-26px;top:50%;width:52px;height:52px;margin-top:-26px;border-radius:50%;background:inherit;transition:background .2s}
 .tile[aria-checked="false"].tile-lost{background:var(--soft-brand);color:var(--accent-text)}
 .tile[aria-checked="false"].tile-found{background:var(--soft-green);color:var(--green-text)}
+.tile:focus-visible{outline:3px solid var(--brand);outline-offset:3px}
 .tile[aria-checked="true"] .tile-title::before{content:"\2713\00a0"}
 .tile:hover[aria-checked="false"]{filter:brightness(.97)}
 
@@ -80,7 +81,7 @@ main.wide{max-width:1180px}
 @media (min-width:640px){.grid2{grid-template-columns:1fr 1fr}}
 .field{border:0;margin:0 0 18px;padding:0;min-width:0}
 .field>label,.field>legend{display:block;font-weight:600;font-size:.95rem;margin-bottom:6px;padding:0}
-.hint{color:var(--muted);font-size:.85rem;margin-top:5px}
+.hint{color:var(--muted);font-size:.9rem;margin-top:5px}
 .input{width:100%;padding:12px 14px;border:1.5px solid var(--line-strong);border-radius:12px;background:var(--bg);transition:border-color .15s,background .15s}
 .input:hover{border-color:var(--muted)}
 .input:focus{outline:none;border-color:var(--green);background:var(--surface);box-shadow:0 0 0 3px color-mix(in srgb,var(--green) 28%,transparent)}
@@ -129,9 +130,9 @@ textarea.input{min-height:104px;resize:vertical}
 .match h3{font-size:1.1rem;font-weight:700}
 .match .meta{color:var(--muted);font-size:.9rem;margin:2px 0 8px}
 .match .desc{margin-bottom:10px}
-.tier{display:inline-block;font-size:.78rem;font-weight:700;border-radius:999px;padding:2px 10px;margin-left:6px;vertical-align:2px;background:var(--soft-green);color:var(--green-text)}
+.tier{display:inline-block;font-size:.88rem;font-weight:700;border-radius:999px;padding:2px 10px;margin-left:6px;vertical-align:2px;background:var(--soft-green);color:var(--green-text)}
 .match.med .tier{background:var(--soft-warn);color:var(--warn)}.match.low .tier{background:var(--line);color:var(--muted)}
-.meters{list-style:none;margin:0;padding:0;display:grid;gap:6px 22px;grid-template-columns:1fr;font-size:.8rem;color:var(--muted)}
+.meters{list-style:none;margin:0;padding:0;display:grid;gap:6px 22px;grid-template-columns:1fr;font-size:.9rem;color:var(--muted)}
 @media (min-width:560px){.meters{grid-template-columns:1fr 1fr}}
 .meters li{display:grid;grid-template-columns:78px 1fr 34px;gap:8px;align-items:center}
 .bar{height:6px;border-radius:99px;background:var(--line);overflow:hidden}
@@ -148,7 +149,8 @@ textarea.input{min-height:104px;resize:vertical}
 .page-head{display:flex;gap:12px;align-items:center;flex-wrap:wrap;margin-bottom:20px}
 .page-head h1{font-size:1.9rem;font-weight:800;margin-right:auto}
 .stats{display:grid;gap:12px;grid-template-columns:repeat(2,1fr);margin-bottom:20px}
-@media (min-width:760px){.stats{grid-template-columns:repeat(4,1fr)}}
+@media (min-width:760px){.stats{grid-template-columns:repeat(5,1fr)}}
+@media (max-width:759px){.stats .stat:last-child:nth-child(odd){grid-column:1/-1}}
 .stat{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:14px 16px;text-align:left;width:100%;font:inherit;color:inherit;display:block}
 button.stat{cursor:pointer;transition:transform .12s,box-shadow .12s,background .12s}
 button.stat:hover{transform:translateY(-2px);box-shadow:0 6px 16px rgba(0,0,0,.12)}
@@ -157,7 +159,7 @@ button.stat[aria-pressed="true"]{background:var(--soft-brand);border-color:var(-
 .stat b{display:block;font:800 1.9rem/1.1 var(--font-head)}
 .stat span{color:var(--muted);font-size:.88rem}
 .table[hidden],.skeleton-list[hidden]{display:none!important}
-.stat small{display:block;color:var(--muted);font-size:.75rem;margin-top:4px;opacity:.85}
+.stat small{display:block;color:var(--muted);font-size:.85rem;margin-top:4px;opacity:.85}
 /* skeleton loading */
 .sk{display:block;border-radius:8px;background:linear-gradient(90deg,var(--line) 25%,var(--line-strong) 37%,var(--line) 63%);background-size:400% 100%;animation:sk-shimmer 1.3s ease infinite}
 @keyframes sk-shimmer{0%{background-position:100% 50%}100%{background-position:0 50%}}
@@ -173,7 +175,7 @@ button.stat[aria-pressed="true"]{background:var(--soft-brand);border-color:var(-
 #refresh-btn .spin{display:inline-block;width:12px;height:12px;border:2px solid currentColor;border-right-color:transparent;border-radius:50%;margin-right:6px;vertical-align:-1px;animation:spin .7s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
 .stat.lost{border-top:4px solid var(--brand)}.stat.found{border-top:4px solid var(--green)}
-.stat.matched{border-top:4px solid #d49a2e}.stat.claimed{border-top:4px solid var(--line-strong)}
+.stat.matched{border-top:4px solid #d49a2e}.stat.claimed{border-top:4px solid var(--line-strong)}.stat.archived{border-top:4px solid var(--line)}
 .toolbar{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:14px;align-items:center}
 .seg{display:inline-flex;background:var(--surface);border:1px solid var(--line);border-radius:999px;padding:3px}
 .seg button{border:0;background:transparent;padding:6px 14px;border-radius:999px;font-weight:600;font-size:.9rem;color:var(--muted);cursor:pointer}
@@ -182,16 +184,43 @@ button.stat[aria-pressed="true"]{background:var(--soft-brand);border-color:var(-
 .toolbar .search{flex:1 1 220px}
 .table-wrap{background:var(--surface);border:1px solid var(--line);border-radius:16px;overflow:hidden}
 .table{width:100%;border-collapse:collapse;font-size:.92rem}
-.table th{text-align:left;font-weight:600;color:var(--muted);font-size:.85rem;padding:12px 14px;background:var(--bg);border-bottom:1px solid var(--line)}
+.table th{text-align:left;font-weight:600;color:var(--muted);font-size:.85rem;padding:12px 14px;background:var(--panel);border-bottom:1px solid var(--line)}
 .table td{padding:14px;border-bottom:1px solid var(--line);vertical-align:top}
 .table tr:last-child td{border-bottom:0}
+#rows tr{cursor:pointer;transition:background .15s}
+#rows tr:hover{background:var(--panel)}
+#rows tr:focus-visible{outline:3px solid var(--green);outline-offset:-3px}
 .table .item p{color:var(--muted);margin-top:2px;max-width:34ch;overflow-wrap:anywhere}
 .muted{color:var(--muted)}
 .num{font-weight:700;font-variant-numeric:tabular-nums}
-.badge{display:inline-block;font-size:.8rem;font-weight:700;padding:2px 10px;border-radius:999px}
+.badge{display:inline-block;font-size:.88rem;font-weight:700;padding:2px 10px;border-radius:999px}
 .badge.lost{background:var(--soft-brand);color:var(--accent-text)}
 .badge.found{background:var(--soft-green);color:var(--green-text)}
-.status-select{padding:6px 10px;border-radius:9px;border:1.5px solid var(--line-strong);background:var(--bg);font-weight:600;font-size:.88rem}
+.table td{vertical-align:middle}
+.act-row{display:grid;grid-template-columns:max-content max-content 40px;gap:8px;align-items:center;justify-content:start}
+.act-row .btn{width:100%;white-space:nowrap}
+.act-row .a1{grid-column:1}.act-row .a2{grid-column:2}.act-row .a3{grid-column:3;justify-self:center}
+@media (max-width:860px){.act-row{display:flex;flex-wrap:wrap;justify-content:flex-start}.act-row .btn{width:auto}}
+.actions .act-row .btn{margin-right:0}
+.badge.unmatched{background:var(--panel);color:var(--muted);box-shadow:inset 0 0 0 1px var(--line-strong)}
+.badge.matched{background:var(--soft-warn);color:var(--warn)}
+.badge.claimed{background:var(--soft-green);color:var(--green-text)}
+.badge.archived{background:var(--panel);color:var(--muted);box-shadow:inset 0 0 0 1px var(--line);display:inline-flex;gap:6px;align-items:center}
+button.badge{border:0;cursor:pointer;font-family:inherit;display:inline-flex;gap:6px;align-items:center}
+button.badge:hover{filter:brightness(.95)}
+button.badge:focus-visible{outline:3px solid var(--brand);outline-offset:2px}
+.link-btn{background:none;border:0;color:var(--muted);text-decoration:underline;cursor:pointer;font:inherit;font-size:.82rem;padding:0}
+.link-btn:hover{color:var(--ink)}
+.mini{background:var(--panel);border-radius:12px;padding:12px 14px;font-size:.92rem}
+.mini p{color:var(--muted);margin-top:2px;overflow-wrap:anywhere}
+.mini .badge{margin-right:6px}
+.pair{display:grid;gap:10px}
+@media (min-width:640px){.pair{grid-template-columns:1fr 1fr}}
+.facts{display:grid;grid-template-columns:auto 1fr;gap:8px 16px;font-size:.95rem}
+.facts dt{color:var(--muted)}.facts dd{font-weight:600;overflow-wrap:anywhere}
+dialog.confirm{width:min(440px,94vw)}
+.dlg-actions{display:flex;gap:10px;justify-content:flex-end;flex-wrap:wrap}
+.dlg-note{background:var(--soft-warn);color:var(--warn);border-radius:10px;padding:10px 12px;font-size:.9rem}
 .actions{white-space:nowrap}
 .actions .btn{margin-right:6px}
 .icon-btn{border:0;background:transparent;cursor:pointer;padding:7px;border-radius:9px;color:var(--muted);vertical-align:middle}
@@ -201,7 +230,7 @@ button.stat[aria-pressed="true"]{background:var(--soft-brand);border-color:var(-
 @media (max-width:860px){
   .table thead{display:none}
   .table,.table tbody,.table tr,.table td{display:block}
-  .table tr{border-bottom:8px solid var(--bg);padding:10px 14px}
+  .table tr{border-bottom:8px solid var(--panel);padding:10px 14px}
   .table td{display:flex;gap:12px;justify-content:space-between;padding:6px 0;border:0}
   .table td::before{content:attr(data-label);color:var(--muted);font-weight:600;flex:0 0 92px}
   .table .item p{max-width:none}
@@ -212,10 +241,12 @@ button.stat[aria-pressed="true"]{background:var(--soft-brand);border-color:var(-
 dialog{border:0;border-radius:22px;padding:0;width:min(760px,94vw);max-height:90vh;background:var(--surface);color:var(--ink)}
 dialog::backdrop{background:rgba(8,20,25,.6)}
 .dlg-head{display:flex;gap:12px;align-items:flex-start;padding:22px 24px 14px}
-.dlg-head h2{font-size:1.35rem;margin-right:auto}
+.dlg-head>div{flex:1;min-width:0}
+.dlg-head h2{font-size:1.35rem}
+.dlg-head .btn{flex:0 0 auto}
 .dlg-head p{color:var(--muted);font-size:.9rem;margin-top:3px}
 .dlg-body{padding:0 24px 24px;overflow:auto;max-height:calc(90vh - 100px);display:grid;gap:14px}
-.cand .who{background:var(--bg);border-radius:10px;padding:10px 12px;font-size:.9rem;margin:10px 0}
+.cand .who{background:var(--panel);border-radius:10px;padding:10px 12px;font-size:.9rem;margin:10px 0}
 .cand .btns{display:flex;gap:8px;flex-wrap:wrap}
 
 .toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:11px 18px;border-radius:12px;font-weight:600;z-index:50;box-shadow:0 8px 24px rgba(0,0,0,.25)}
@@ -224,13 +255,13 @@ dialog::backdrop{background:rgba(8,20,25,.6)}
 .badge.test{background:var(--soft-warn);color:var(--warn);margin-left:6px}
 .who-am-i{color:var(--muted);font-size:.9rem}
 .btn.ghost.danger{color:var(--danger)}.btn.ghost.danger:hover{background:var(--soft-danger)}
-footer{text-align:center;color:var(--muted);font-size:.82rem;padding:0 20px 36px}
+footer{text-align:center;color:var(--muted);font-size:.9rem;padding:0 20px 36px}
 
 @media (max-width:560px){
   main{padding-top:24px}
   .tile{padding:16px 16px;min-height:104px}
-  .tile-found{padding-left:34px}
   .tile-title{font-size:1.02rem}.tile-sub{font-size:.78rem}
+  .tile-found{padding-left:34px}
   .tile-lost::after{width:40px;height:40px;margin-top:-20px;right:-20px}
   .card{padding:20px 16px}
   .brand small{display:none}
@@ -261,13 +292,13 @@ footer{text-align:center;color:var(--muted);font-size:.82rem;padding:0 20px 36px
 
   <section class="hero" id="hero">
     <h1>Lost it? Found it? Tell us.</h1>
-    <p>Report an item and the system will compare it against everything on file.</p>
+    <p>Report an item and barangay staff will compare it against everything on file, then contact you.</p>
   </section>
 
-  <div class="pair" id="pair" role="radiogroup" aria-label="What happened?">
+  <div class="tile-group" id="pair" role="radiogroup" aria-label="What happened?">
     <button type="button" class="tile tile-lost" role="radio" aria-checked="true" data-type="lost">
       <span class="tile-title">I lost something</span>
-      <span class="tile-sub">System will look for a match</span>
+      <span class="tile-sub">Staff will look for a match</span>
     </button>
     <button type="button" class="tile tile-found" role="radio" aria-checked="false" data-type="found">
       <span class="tile-title">I found something</span>
@@ -372,11 +403,12 @@ footer{text-align:center;color:var(--muted);font-size:.82rem;padding:0 20px 36px
         <button type="button" data-v="found" aria-pressed="false">Found</button>
       </div>
       <select class="input" id="status-filter" aria-label="Filter by status">
-        <option value="all">Any status</option>
+        <option value="all">All active</option>
         <option value="open">Still open</option>
         <option value="unmatched">Unmatched</option>
         <option value="matched">Matched</option>
         <option value="claimed">Claimed</option>
+        <option value="archived">Archived</option>
       </select>
       <select class="input" id="data-filter" aria-label="Filter by real or test data">
         <option value="all">All data</option>
@@ -398,6 +430,55 @@ footer{text-align:center;color:var(--muted);font-size:.82rem;padding:0 20px 36px
   </section>
 </main>
 
+<dialog id="claim-dialog" aria-labelledby="claim-title">
+  <div class="dlg-head">
+    <div><h2 id="claim-title">Mark as claimed?</h2><p>Check that the person is the real owner before you confirm.</p></div>
+    <button class="btn ghost small" id="claim-close" type="button">Close</button>
+  </div>
+  <div class="dlg-body">
+    <div class="pair" id="claim-pair"></div>
+    <div class="field" id="f-claim-partner" hidden>
+      <label for="claim-partner">Matching report</label>
+      <select class="input" id="claim-partner"></select>
+      <p class="hint">This match was made before reports were linked. Pick the other report so both are claimed together.</p>
+    </div>
+    <div class="field" id="f-claim-name">
+      <label for="claim-name">Claimed by (full name)</label>
+      <input class="input" id="claim-name" maxlength="100" autocomplete="off">
+      <p class="error" id="claim-err" hidden></p>
+    </div>
+    <div class="field">
+      <label for="claim-note">Note (optional)</label>
+      <input class="input" id="claim-note" maxlength="300" autocomplete="off" placeholder="For example: showed a school ID">
+    </div>
+    <p class="dlg-note">Once confirmed, both reports are locked. Their status cannot be changed or deleted.</p>
+    <div class="dlg-actions">
+      <button class="btn ghost" id="claim-cancel" type="button">Cancel</button>
+      <button class="btn green" id="claim-confirm" type="button">Confirm claimed</button>
+    </div>
+  </div>
+</dialog>
+
+<dialog id="signout-dialog" aria-labelledby="signout-title" class="confirm">
+  <div class="dlg-head">
+    <div><h2 id="signout-title">Sign out?</h2><p>You will need your email and password to open the staff area again.</p></div>
+  </div>
+  <div class="dlg-body">
+    <div class="dlg-actions">
+      <button class="btn ghost" id="signout-cancel" type="button" autofocus>Stay signed in</button>
+      <button class="btn" id="signout-confirm" type="button">Sign out</button>
+    </div>
+  </div>
+</dialog>
+
+<dialog id="detail-dialog" aria-labelledby="detail-title">
+  <div class="dlg-head">
+    <div><h2 id="detail-title">Claim details</h2><p id="detail-sub"></p></div>
+    <button class="btn ghost small" id="detail-close" type="button">Close</button>
+  </div>
+  <div class="dlg-body" id="detail-body"></div>
+</dialog>
+
 <dialog id="match-dialog" aria-labelledby="dlg-title">
   <div class="dlg-head">
     <div><h2 id="dlg-title">Possible matches</h2><p id="dlg-sub"></p></div>
@@ -406,7 +487,7 @@ footer{text-align:center;color:var(--muted);font-size:.82rem;padding:0 20px 36px
   <div class="dlg-body" id="dlg-body"></div>
 </dialog>
 
-<footer>Tugma is a test system for Barangay Sta. Rita.</footer>
+<footer>Tugma is a test system for Barangay Sta. Rita. · Version 2026-11-03 (auto-refresh, claim lock, archive)</footer>
 
 <script>
 (function () {
@@ -724,10 +805,42 @@ footer{text-align:center;color:var(--muted);font-size:.82rem;padding:0 20px 36px
     }
   });
 
-  $('#signout-btn').addEventListener('click', () => signOut());
+  // Signing out asks first, so a stray click cannot end the session.
+  const signoutDlg = $('#signout-dialog');
+  $('#signout-btn').addEventListener('click', () => signoutDlg.showModal());
+  $('#signout-cancel').addEventListener('click', () => signoutDlg.close());
+  signoutDlg.addEventListener('click', e => { if (e.target === signoutDlg) signoutDlg.close(); });
+  $('#signout-confirm').addEventListener('click', () => { signoutDlg.close(); signOut(); });
   $('#refresh-btn').addEventListener('click', () => loadReports(true));
 
   let loading = false;
+  let archiveNoteShown = false;
+  // Tell staff when reports were just archived (3 months without a match), or if archiving is not set up yet.
+  function archiveNotice(data) {
+    if (data.archived) toast(data.archived + ' report' + (data.archived > 1 ? 's were' : ' was') + ' archived (no match for 3 months)');
+    else if (data.archive_note && !archiveNoteShown) { archiveNoteShown = true; toast(data.archive_note, true); }
+  }
+  // Auto refresh: quietly pull new reports every 10s while the staff page is open (no skeleton, no toast).
+  const sig = list => list.map(r => [r.id, r.status, r.matched_with, r.claimed_at].join(':')).join('|');
+  async function silentRefresh() {
+    if (loading || document.hidden || !session || !location.hash.startsWith('#/staff')) return;
+    if (document.querySelector('dialog[open]')) return; // never redraw under an open dialog
+    try {
+      const data = await staffApi('list');
+      const next = data.reports || [];
+      if (sig(next) !== sig(reports)) {
+        const newCount = next.filter(n => !reports.some(r => r.id === n.id)).length;
+        reports = next;
+        archiveNotice(data);
+        renderStaff();
+        if (newCount) toast(newCount + ' new report' + (newCount > 1 ? 's' : ''));
+      }
+    } catch (err) {
+      if (err.status === 401 || err.status === 403) signOut('Your session ended. Sign in again.');
+    }
+  }
+  setInterval(silentRefresh, 10000);
+  document.addEventListener('visibilitychange', () => { if (!document.hidden) silentRefresh(); });
   function setLoading(on) {
     loading = on;
     const btn = $('#refresh-btn');
@@ -736,7 +849,7 @@ footer{text-align:center;color:var(--muted);font-size:.82rem;padding:0 20px 36px
     btn.innerHTML = on ? '<span class="spin" aria-hidden="true"></span>Refreshing' : 'Refresh';
     $('#stats').setAttribute('aria-busy', String(on));
     if (on) {
-      $('#stats').innerHTML = [0, 1, 2, 3].map(() => '<div class="stat"><span class="sk n"></span><span class="sk l"></span></div>').join('');
+      $('#stats').innerHTML = [0, 1, 2, 3, 4].map(() => '<div class="stat"><span class="sk n"></span><span class="sk l"></span></div>').join('');
       $('#skeleton').innerHTML = [0, 1, 2, 3, 4].map(() =>
         '<div class="sk-row"><span class="sk"></span><span class="sk"></span><span class="sk"></span><span class="sk"></span><span class="sk"></span><span class="sk"></span></div>').join('');
     }
@@ -752,12 +865,13 @@ footer{text-align:center;color:var(--muted);font-size:.82rem;padding:0 20px 36px
     try {
       const data = await staffApi('list');
       reports = data.reports || [];
+      archiveNotice(data);
       // Keep the skeleton on screen long enough to be seen, even on a fast connection.
       const wait = 450 - (Date.now() - started);
       if (wait > 0) await new Promise(r => setTimeout(r, wait));
       setLoading(false);
       renderStaff();
-      if (showToast) toast('Reports refreshed');
+      if (showToast && !data.archived) toast('Reports refreshed');
     } catch (err) {
       setLoading(false);
       renderStaff();
@@ -768,20 +882,23 @@ footer{text-align:center;color:var(--muted);font-size:.82rem;padding:0 20px 36px
   }
 
   const stOf = r => r.status || 'unmatched';
+  const isOpen = r => stOf(r) === 'unmatched' || stOf(r) === 'matched'; // not claimed, not archived
   const scope = () => reports.filter(r => filter.data === 'all' || (filter.data === 'test') === !!r.is_test);
 
   function renderStats() {
     const c = {
-      lost: scope().filter(r => r.report_type === 'lost' && stOf(r) !== 'claimed').length,
-      found: scope().filter(r => r.report_type === 'found' && stOf(r) !== 'claimed').length,
+      lost: scope().filter(r => r.report_type === 'lost' && isOpen(r)).length,
+      found: scope().filter(r => r.report_type === 'found' && isOpen(r)).length,
       matched: scope().filter(r => stOf(r) === 'matched').length,
-      claimed: scope().filter(r => stOf(r) === 'claimed').length
+      claimed: scope().filter(r => stOf(r) === 'claimed').length,
+      archived: scope().filter(r => stOf(r) === 'archived').length
     };
     const cards = [
       ['lost', 'lost', 'open', c.lost, 'Lost, still open'],
       ['found', 'found', 'open', c.found, 'Found, still open'],
       ['matched', 'all', 'matched', c.matched, 'Matched'],
-      ['claimed', 'all', 'claimed', c.claimed, 'Claimed']
+      ['claimed', 'all', 'claimed', c.claimed, 'Claimed'],
+      ['archived', 'all', 'archived', c.archived, 'Archived']
     ];
     $('#stats').innerHTML = cards.map(([cls, type, status, n, label]) => {
       const on = filter.type === type && filter.status === status;
@@ -807,18 +924,47 @@ footer{text-align:center;color:var(--muted);font-size:.82rem;padding:0 20px 36px
     $('#status-filter').value = filter.status;
   }
 
+  const LOCK = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>';
+  const BOX = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="5" rx="1"/><path d="M5 9v10h14V9M10 13h4"/></svg>';
+  const TRASH = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 6h18M8 6V4h8v2M6 6l1 14h10l1-14M10 10v6M14 10v6"/></svg>';
+  const byId = id => reports.find(r => r.id === id);
+  const pairOf = r => (r && r.matched_with ? byId(r.matched_with) || null : null);
+
+  function statusCell(r) {
+    const st = stOf(r);
+    if (st === 'claimed') {
+      return '<button type="button" class="badge claimed" data-act="details" aria-label="View claim details of report ' + esc(r.id) + '">' + LOCK + 'Claimed</button>';
+    }
+    if (st === 'matched') {
+      return '<span class="badge matched">Matched' + (r.matched_with ? ' with #' + esc(r.matched_with) : '') + '</span>';
+    }
+    if (st === 'archived') return '<span class="badge archived">' + BOX + 'Archived</span>';
+    return '<span class="badge unmatched">Unmatched</span>';
+  }
+
+  // Every row keeps its buttons on one line, right-aligned, so rows line up.
+  function actionsCell(r) {
+    const st = stOf(r);
+    const trash = '<button class="icon-btn a3" data-act="delete" aria-label="Delete report ' + esc(r.id) + '">' + TRASH + '</button>';
+    if (st === 'claimed') return '<div class="act-row"><button class="btn ghost small a1" data-act="details">View details</button></div>';
+    if (st === 'archived') return '<div class="act-row"><button class="btn ghost small a1" data-act="details">View details</button>' + trash + '</div>';
+    if (st === 'matched') {
+      return '<div class="act-row"><button type="button" class="btn green small a1" data-act="claim">Claimed</button>' +
+        '<button type="button" class="btn ghost small a2" data-act="unmatch">Undo match</button>' + trash + '</div>';
+    }
+    return '<div class="act-row"><button class="btn ghost small a1" data-act="matches">Find matches</button>' + trash + '</div>';
+  }
+
   function rowHtml(r) {
     const st = stOf(r);
-    return '<tr data-id="' + esc(r.id) + '">' +
+    return '<tr data-id="' + esc(r.id) + '" tabindex="0" title="Click to view details">' +
       '<td data-label="No."><span class="num">#' + esc(r.id) + '</span>' + (r.is_test ? '<span class="badge test">Test</span>' : '') + '</td>' +
       '<td data-label="Type"><span class="badge ' + esc(r.report_type) + '">' + (r.report_type === 'lost' ? 'Lost' : 'Found') + '</span></td>' +
       '<td data-label="Item" class="item"><div><b>' + esc(r.category) + '</b>, ' + esc(r.color) + '<p>' + esc(r.description) + '</p></div></td>' +
       '<td data-label="Where and when"><div>' + esc(r.location) + '<br><span class="muted">' + esc(fmtDate(r.report_date)) + '</span></div></td>' +
       '<td data-label="Reporter"><div>' + esc(r.reporter_name) + '<br><a href="tel:' + esc(r.reporter_contact) + '">' + esc(r.reporter_contact) + '</a></div></td>' +
-      '<td data-label="Status"><select class="status-select" data-act="status" aria-label="Status of report ' + esc(r.id) + '">' +
-        ['unmatched', 'matched', 'claimed'].map(s => '<option value="' + s + '"' + (s === st ? ' selected' : '') + '>' + s[0].toUpperCase() + s.slice(1) + '</option>').join('') + '</select></td>' +
-      '<td class="actions"><button class="btn ghost small" data-act="matches">Find matches</button>' +
-        '<button class="icon-btn" data-act="delete" aria-label="Delete report ' + esc(r.id) + '"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 6h18M8 6V4h8v2M6 6l1 14h10l1-14M10 10v6M14 10v6"/></svg></button></td>' +
+      '<td data-label="Status">' + statusCell(r) + '</td>' +
+      '<td class="actions">' + actionsCell(r) + '</td>' +
       '</tr>';
   }
 
@@ -830,8 +976,8 @@ footer{text-align:center;color:var(--muted);font-size:.82rem;padding:0 20px 36px
     const q = filter.q.trim().toLowerCase();
     const list = scope().filter(r =>
       (filter.type === 'all' || r.report_type === filter.type) &&
-      (filter.status === 'all' || (filter.status === 'open' ? stOf(r) !== 'claimed' : stOf(r) === filter.status)) &&
-      (!q || [r.id, r.category, r.color, r.description, r.location, r.reporter_name, r.reporter_contact].join(' ').toLowerCase().includes(q))
+      (filter.status === 'all' ? stOf(r) !== 'archived' : filter.status === 'open' ? isOpen(r) : stOf(r) === filter.status) &&
+      (!q || [r.id, r.category, r.color, r.description, r.location, r.reporter_name, r.reporter_contact, r.claimed_by_name].join(' ').toLowerCase().includes(q))
     );
     $('#rows').innerHTML = list.map(rowHtml).join('');
     const empty = $('#empty');
@@ -865,34 +1011,150 @@ footer{text-align:center;color:var(--muted);font-size:.82rem;padding:0 20px 36px
   });
   $('#search').addEventListener('input', e => { filter.q = e.target.value; renderStaff(); });
 
-  async function setStatus(ids, status) {
+  // Runs a staff action, merges the updated rows into the list, and reports errors.
+  async function act(action, payload, okMsg) {
     try {
-      await staffApi('update', { ids, status });
-      reports.forEach(r => { if (ids.includes(r.id)) r.status = status; });
+      const data = await staffApi(action, payload);
+      (data.rows || []).forEach(nr => {
+        const i = reports.findIndex(r => r.id === nr.id);
+        if (i >= 0) reports[i] = nr;
+      });
       renderStaff();
-      toast('Status changed to ' + status);
+      if (okMsg) toast(okMsg);
+      return data;
     } catch (err) {
-      if (err.status === 401) return signOut('Your session ended. Sign in again.');
+      if (err.status === 401) { signOut('Your session ended. Sign in again.'); return null; }
       toast(err.message, true);
-      renderStaff();
+      if (err.status === 409) loadReports(); // someone else changed it: show the current state
+      return null;
     }
   }
 
-  $('#rows').addEventListener('change', e => {
-    const sel = e.target.closest('[data-act="status"]');
-    if (sel) setStatus([Number(sel.closest('tr').dataset.id)], sel.value);
+  const miniCard = r => '<div class="mini"><span class="badge ' + esc(r.report_type) + '">' + (r.report_type === 'lost' ? 'Lost' : 'Found') + '</span><b>#' + esc(r.id) + ' ' + esc(r.category) + ', ' + esc(r.color) + '</b>' +
+    '<p>' + esc(r.description) + '</p><p>' + esc(r.location) + ' &middot; ' + esc(fmtDate(r.report_date)) + '</p>' +
+    '<p>' + esc(r.reporter_name) + ' &middot; ' + esc(r.reporter_contact) + '</p></div>';
+
+  /* ---------- claim confirmation ---------- */
+  const claimDlg = $('#claim-dialog');
+  let claimingId = null;
+  $('#claim-close').addEventListener('click', () => claimDlg.close());
+  $('#claim-cancel').addEventListener('click', () => claimDlg.close());
+  claimDlg.addEventListener('click', e => { if (e.target === claimDlg) claimDlg.close(); });
+
+  // Shows the report being claimed next to its partner (linked, or chosen in the list).
+  function claimPair() {
+    const r = byId(claimingId);
+    const partner = pairOf(r) || byId(Number($('#claim-partner').value));
+    return [r, partner].filter(Boolean).sort((a, b) => (a.report_type === 'lost' ? -1 : 1) - (b.report_type === 'lost' ? -1 : 1));
+  }
+  function drawClaimPair() {
+    const both = claimPair();
+    $('#claim-pair').innerHTML = both.map(miniCard).join('');
+    const lost = both.find(x => x.report_type === 'lost');
+    if (lost && !$('#claim-name').dataset.edited) $('#claim-name').value = lost.reporter_name;
+  }
+  $('#claim-partner').addEventListener('change', drawClaimPair);
+  $('#claim-name').addEventListener('input', e => { e.target.dataset.edited = '1'; });
+
+  function openClaim(id) {
+    const r = byId(id);
+    if (!r || stOf(r) !== 'matched') return;
+    const partner = pairOf(r);
+    claimingId = id;
+    // Older matches have no link to their partner: let staff choose it.
+    const sel = $('#claim-partner');
+    $('#f-claim-partner').hidden = !!partner;
+    if (!partner) {
+      const cands = reports.filter(x => x.id !== r.id && x.report_type !== r.report_type && stOf(x) === 'matched' && !x.matched_with && !!x.is_test === !!r.is_test);
+      sel.innerHTML = '<option value="">Claim this report only</option>' + cands.map(x =>
+        '<option value="' + esc(x.id) + '">' + (x.report_type === 'lost' ? 'Lost' : 'Found') + ' #' + esc(x.id) + ': ' + esc(x.category) + ', ' + esc(x.color) + ' (' + esc(x.reporter_name) + ')</option>').join('');
+      if (cands.length === 1) sel.value = String(cands[0].id);
+    }
+    delete $('#claim-name').dataset.edited;
+    $('#claim-name').value = '';
+    $('#claim-note').value = '';
+    setErr('claim-name', '');
+    drawClaimPair();
+    $('#claim-confirm').disabled = false;
+    claimDlg.showModal();
+    $('#claim-name').focus();
+  }
+
+  $('#claim-confirm').addEventListener('click', async () => {
+    const name = $('#claim-name').value.trim();
+    if (!name) { setErr('claim-name', 'Enter the name of the person who claimed the item.'); return; }
+    setErr('claim-name', '');
+    $('#claim-confirm').disabled = true;
+    const ok = await act('claim', { id: claimingId, claimant_name: name, note: $('#claim-note').value.trim(), partner_id: $('#f-claim-partner').hidden ? '' : $('#claim-partner').value }, 'Marked as claimed. Both reports are now locked.');
+    $('#claim-confirm').disabled = false;
+    if (ok) claimDlg.close();
+  });
+
+  /* ---------- claim details (read only) ---------- */
+  const detailDlg = $('#detail-dialog');
+  $('#detail-close').addEventListener('click', () => detailDlg.close());
+  detailDlg.addEventListener('click', e => { if (e.target === detailDlg) detailDlg.close(); });
+
+  function openDetails(id) {
+    const r = byId(id);
+    if (!r) return;
+    const partner = pairOf(r);
+    const both = [r, partner].filter(Boolean).sort((a, b) => (a.report_type === 'lost' ? -1 : 1) - (b.report_type === 'lost' ? -1 : 1));
+    const st = stOf(r);
+    $('#detail-title').textContent = st === 'claimed' ? 'Claim details' : st === 'archived' ? 'Archived report' : 'Report details';
+    const ids = 'Report' + (both.length > 1 ? 's #' + both.map(x => x.id).join(' and #') : ' #' + r.id);
+    $('#detail-sub').textContent = st === 'claimed' ? ids + (both.length > 1 ? ' are locked.' : ' is locked.') : st === 'archived' ? ids + ' was archived automatically.' : ids + (st === 'matched' ? ' matched.' : '');
+    let facts;
+    if (st === 'claimed') {
+      const when = r.claimed_at ? new Date(r.claimed_at).toLocaleString('en-PH', { dateStyle: 'long', timeStyle: 'short' }) : '';
+      facts = r.claimed_at
+        ? '<dl class="facts"><dt>Status</dt><dd>Claimed</dd><dt>Claimed on</dt><dd>' + esc(when) + '</dd>' +
+          '<dt>Claimed by</dt><dd>' + esc(r.claimed_by_name || 'Not recorded') + '</dd>' +
+          '<dt>Handled by staff</dt><dd>' + esc(r.claimed_by_staff || 'Not recorded') + '</dd>' +
+          '<dt>Note</dt><dd>' + esc(r.claim_note || 'None') + '</dd></dl>'
+        : '<p class="muted">No claim details were recorded. This report was marked as claimed before claim records existed.</p>';
+    } else if (st === 'archived') {
+      const fmt = v => v ? new Date(v).toLocaleString('en-PH', { dateStyle: 'long', timeStyle: 'short' }) : 'Not recorded';
+      facts = '<dl class="facts"><dt>Status</dt><dd>Archived</dd><dt>Reason</dt><dd>No match for 3 months or more</dd>' +
+        '<dt>Submitted on</dt><dd>' + esc(fmt(r.created_at)) + '</dd><dt>Archived on</dt><dd>' + esc(fmt(r.archived_at)) + '</dd></dl>';
+    } else {
+      facts = '<dl class="facts"><dt>Status</dt><dd>' + (st === 'matched' ? 'Matched' + (partner ? ' with #' + esc(partner.id) : '') : 'Unmatched') + '</dd></dl>';
+    }
+    $('#detail-body').innerHTML = facts + '<div class="pair">' + both.map(miniCard).join('') + '</div>';
+    detailDlg.showModal();
+  }
+
+  // click anywhere on a row (not on its buttons or phone link) to see the report
+  $('#rows').addEventListener('click', e => {
+    if (e.target.closest('button, a')) return;
+    const tr = e.target.closest('tr');
+    if (tr) openDetails(Number(tr.dataset.id));
+  });
+  $('#rows').addEventListener('keydown', e => {
+    if (e.key !== 'Enter' || e.target.tagName !== 'TR') return;
+    openDetails(Number(e.target.dataset.id));
   });
 
   $('#rows').addEventListener('click', async e => {
     const btn = e.target.closest('button[data-act]');
     if (!btn) return;
     const id = Number(btn.closest('tr').dataset.id);
-    if (btn.dataset.act === 'matches') return openMatches(id);
-    if (btn.dataset.act === 'delete') {
-      if (!confirm('Delete report #' + id + '? This cannot be undone.')) return;
+    const a = btn.dataset.act;
+    if (a === 'matches') return openMatches(id);
+    if (a === 'claim') return openClaim(id);
+    if (a === 'details') return openDetails(id);
+    if (a === 'unmatch') {
+      if (!confirm('Undo this match? Both reports go back to Unmatched.')) return;
+      return act('unmatch', { id }, 'Match undone');
+    }
+    if (a === 'delete') {
+      const r = byId(id);
+      const warn = r && stOf(r) === 'matched' ? ' Its matched partner will go back to Unmatched.' : '';
+      if (!confirm('Delete report #' + id + '? This cannot be undone.' + warn)) return;
       try {
-        await staffApi('delete', { id });
-        reports = reports.filter(r => r.id !== id);
+        const out = await staffApi('delete', { id });
+        reports = reports.filter(x => x.id !== id);
+        if (out && out.freed) { const f = byId(out.freed); if (f) { f.status = 'unmatched'; f.matched_with = null; } }
         renderStaff();
         toast('Report #' + id + ' deleted');
       } catch (err) {
@@ -927,7 +1189,7 @@ footer{text-align:center;color:var(--muted);font-size:.82rem;padding:0 20px 36px
           '<p class="meta">' + esc(it.location) + ' &middot; ' + esc(fmtDate(it.report_date)) + ' &middot; ' + esc(stOf(it)) + '</p>' +
           '<p class="desc">' + esc(it.description) + '</p>' + meters(c.scoreBreakdown) +
           '<div class="who">' + esc(it.reporter_name) + ' &middot; <a href="tel:' + esc(it.reporter_contact) + '">' + esc(it.reporter_contact) + '</a></div>' +
-          '<div class="btns"><button class="btn small" data-do="matched">Confirm match</button><button class="btn green small" data-do="claimed">Mark both as claimed</button></div></div></article>';
+          '<div class="btns"><button class="btn small" data-do="match">Confirm match</button></div></div></article>';
       }).join('');
       $('#dlg-body').dataset.base = id;
     } catch (err) {
@@ -943,7 +1205,7 @@ footer{text-align:center;color:var(--muted);font-size:.82rem;padding:0 20px 36px
     const base = Number($('#dlg-body').dataset.base);
     const other = Number(btn.closest('[data-other]').dataset.other);
     dlg.close();
-    await setStatus([base, other], btn.dataset.do);
+    await act('match', { id: base, other }, 'Matched. Click Claimed once the owner picks up the item.');
   });
 
   route();
