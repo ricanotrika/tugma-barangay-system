@@ -60,7 +60,7 @@ export default async function handler(req, res) {
         if (code === "email_not_confirmed" || /not confirmed/i.test(msg)) {
           throw new HttpError(
             401,
-            "This account exists but its email is not confirmed. In Supabase, delete the user and create it again with Auto Confirm User ticked.",
+            "This account exists but its email is not confirmed. If you think this is a mistake, try contacting your management.",
           );
         }
         if (code === "invalid_credentials" || /invalid login credentials/i.test(msg)) {
